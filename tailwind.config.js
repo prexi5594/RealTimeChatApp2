@@ -1,6 +1,9 @@
 module.exports = {
   darkMode: ["class"],
-  content: ["./client/**/*.{ts,tsx}"],
+  content: [
+  "./index.html",
+  "./src/**/*.{js,ts,jsx,tsx}",
+],
   prefix: "",
   theme: {
     container: {
