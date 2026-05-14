@@ -3,46 +3,64 @@ import MessageList from "./MessageList";
 import MessageInput from "./MessageInput";
 import { getMessages, sendMessage } from "../api/ChatApi";
 
-export default function ChatBox() {
+export default function ChatBox({ room }) {
   const [messages, setMessages] = useState([]);
 
+  // =========================
+  // FETCH MESSAGES BY ROOM
+  // =========================
   const fetchMessages = async () => {
-    const data = await getMessages();
+    const data = await getMessages(room);
     setMessages(data);
   };
 
+  // =========================
+  // SEND MESSAGE
+  // =========================
   const handleSend = async (text) => {
-    await sendMessage(text);
+    const username = localStorage.getItem("username") || "anonymous";
 
-    // refresh immediately
-    fetchMessages();
+await sendMessage({
+  room,
+  username,
+  text
+});
 
-    // refresh again after bot response delay
-    setTimeout(() => {
-      fetchMessages();
-    }, 1100);
+// refresh immediately
+fetchMessages();
+
+// optional refresh delay (for sync)
+setTimeout(() => {
+  fetchMessages();
+}, 1000);
   };
 
+  // =========================
+  // LOAD + POLLING
+  // =========================
   useEffect(() => {
-    fetchMessages();
-  }, []);
+    if (!room) return;
 
+fetchMessages();
+
+const interval = setInterval(() => {
+  fetchMessages();
+}, 2000); // polling every 2s
+
+return () => clearInterval(interval);
+  }, [room]);
+
+  // =========================
+  // UI
+  // =========================
   return (
-    <div style={styles.box}>
-      <MessageList messages={messages} />
-      <MessageInput onSend={handleSend} />
-    </div>
+    <div className="chat-box">
+      <h3>Room: {room}</h3>
+
+  <MessageList messages={messages} />
+
+  <MessageInput onSend={handleSend} />
+</div>
   );
 }
 
-const styles = {
-  box: {
-    border: "1px solid #ddd",
-    borderRadius: "10px",
-    padding: "10px",
-    height: "500px",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "space-between",
-  },
-};

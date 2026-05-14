@@ -1,16 +1,13 @@
 export default function MessageItem({ message }) {
+  const isBot = message.user?.toLowerCase().includes("bot");
+  const className = isBot ? "message message-bot" : "message message-user";
+
   return (
-    <div style={styles.message}>
-      <strong>{message.user}:</strong> {message.text}
+    <div className={className}>
+      <div className="message-meta">
+        <span>{message.user}</span>
+      </div>
+      <div className="message-text">{message.text}</div>
     </div>
   );
 }
-
-const styles = {
-  message: {
-    padding: "6px",
-    marginBottom: "5px",
-    background: "#f5f5f5",
-    borderRadius: "6px"
-  }
-};
