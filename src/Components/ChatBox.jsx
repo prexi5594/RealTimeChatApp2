@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import MessageList from "./MessageList";
-import MessageInput from "./MessageInput";
+import MessageList from "./MessageList.jsx";
+import MessageInput from "./MessageInput.jsx";
 import { getMessages, sendMessage } from "../api/ChatApi";
 
 export default function ChatBox({ room }) {

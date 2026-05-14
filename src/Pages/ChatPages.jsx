@@ -1,6 +1,6 @@
-import ChatBox from "../Components/ChatBox";
+import ChatBox from "../Components/ChatBox.jsx";
 
-export default function ChatPage() {
+function ChatPage() {
   return (
     <div style={styles.container}>
       <h2>:speech_balloon: Real-Time Chat App</h2>
@@ -17,3 +17,5 @@ const styles = {
     fontFamily: "Arial"
   }
 };
+
+export default ChatPage;

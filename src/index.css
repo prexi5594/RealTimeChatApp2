@@ -10,8 +10,8 @@
 
 :root {
   /* TEXT COLORS */
-  --text: #dbeafe;
-  --text-h: #ffffff;
+  --text: #1b386a;
+  --text-h: #f5eeee;
 
   /* MAIN BACKGROUND */
   --bg-primary: #0052cc;
@@ -148,7 +148,7 @@ input, textarea, select {
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.18);
   background: rgba(255, 255, 255, 0.1);
-  color: white;
+  color: rgb(8, 8, 8);
   font-size: 16px;
   font-family: var(--sans);
   backdrop-filter: blur(10px);
