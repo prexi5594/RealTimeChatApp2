@@ -1,6 +1,6 @@
 chatbox
 import { useEffect, useState } from "react";
-import MessageList from "./messagelist";
+import MessageList from "./Messagelist";
 import MessageInput from "./MessageInput";
 import { getMessages, sendMessage } from "../api/ChatApi";
 
