@@ -11,38 +11,17 @@ export default function MessageInput({ onSend }) {
   };
 
   return (
-    <div style={styles.inputBox}>
+    <div className="message-input-row">
       <input
         value={text}
         onChange={(e) => setText(e.target.value)}
-        placeholder="Type message..."
-        style={styles.input}
+        onKeyDown={(e) => e.key === "Enter" && handleSend()}
+        placeholder="Type your message..."
+        className="message-input"
       />
-      <button onClick={handleSend} style={styles.button}>
+      <button onClick={handleSend} className="send-button">
         Send
       </button>
     </div>
   );
 }
-
-const styles = {
-  inputBox: {
-    display: "flex",
-    gap: "10px",
-    paddingTop: "10px"
-  },
-  input: {
-    flex: 1,
-    padding: "10px",
-    borderRadius: "6px",
-    border: "1px solid #ccc"
-  },
-  button: {
-    padding: "10px 15px",
-    background: "#007bff",
-    color: "white",
-    border: "none",
-    borderRadius: "6px",
-    cursor: "pointer"
-  }
-};
