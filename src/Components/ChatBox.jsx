@@ -1,6 +1,5 @@
-chatbox
 import { useEffect, useState } from "react";
-import MessageList from "./Messagelist";
+import MessageList from "./MessageList";
 import MessageInput from "./MessageInput";
 import { getMessages, sendMessage } from "../api/ChatApi";
 
@@ -15,14 +14,13 @@ export default function ChatBox() {
   const handleSend = async (text) => {
     await sendMessage(text);
 
-fetchMessages();
+    // refresh immediately
+    fetchMessages();
 
-// fetch again after bot reply
-setTimeout(() => {
-  fetchMessages();
-}, 1100);
-    // Update again after bot response
-    setTimeout(() => fetchMessages(), 1100);
+    // refresh again after bot response delay
+    setTimeout(() => {
+      fetchMessages();
+    }, 1100);
   };
 
   useEffect(() => {
@@ -45,6 +43,6 @@ const styles = {
     height: "500px",
     display: "flex",
     flexDirection: "column",
-    justifyContent: "space-between"
-  }
+    justifyContent: "space-between",
+  },
 };

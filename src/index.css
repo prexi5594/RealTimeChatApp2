@@ -1,0 +1,200 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===================================
+   QUICKCHAT COLOR SYSTEM
+=================================== */
+
+:root {
+  /* TEXT COLORS */
+  --text: #dbeafe;
+  --text-h: #ffffff;
+
+  /* MAIN BACKGROUND */
+  --bg-primary: #0052cc;
+  --bg-secondary: #0077b6;
+  --bg-accent: #00c46a;
+
+  /* UI COLORS */
+  --border: rgba(255, 255, 255, 0.15);
+  --card-bg: rgba(255, 255, 255, 0.08);
+  --glass-bg: rgba(255, 255, 255, 0.12);
+  --code-bg: rgba(255, 255, 255, 0.1);
+
+  /* PRIMARY ACCENT */
+  --accent: #ffffff;
+
+  /* BUTTON COLORS */
+  --btn-primary: #ffffff;
+  --btn-primary-text: #0052cc;
+  --btn-outline: rgba(255, 255, 255, 0.15);
+
+  /* EFFECTS */
+  --shadow:
+    rgba(0, 0, 0, 0.18) 0px 10px 20px,
+    rgba(0, 0, 0, 0.08) 0px 4px 8px;
+
+  /* TYPOGRAPHY */
+  --sans: "Inter", system-ui, sans-serif;
+  --heading: "Inter", system-ui, sans-serif;
+  --mono: ui-monospace, monospace;
+
+  font: 18px/145% var(--sans);
+  color: var(--text);
+
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===================================
+   BODY
+=================================== */
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+
+  background: linear-gradient(
+    90deg,
+    #0052cc 0%,
+    #0052cc 48%,
+    #0077b6 70%,
+    #00c46a 100%
+  );
+
+  color: var(--text);
+  overflow-x: hidden;
+  font-family: var(--sans);
+}
+
+/* ===================================
+   ROOT
+=================================== */
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===================================
+   TYPOGRAPHY
+=================================== */
+
+h1, h2, h3, h4 {
+  color: var(--text-h);
+  font-family: var(--heading);
+  margin: 0;
+}
+
+h1 {
+  font-size: 84px;
+  font-weight: 800;
+  letter-spacing: -3px;
+  line-height: 1.05;
+}
+
+h2 { font-size: 40px; font-weight: 700; }
+h3 { font-size: 28px; font-weight: 600; }
+h4 { font-size: 22px; font-weight: 600; }
+
+p {
+  font-size: 20px;
+  line-height: 1.7;
+  color: #e0ecff;
+}
+
+/* LINKS */
+a {
+  text-decoration: none;
+  color: white;
+  transition: 0.3s ease;
+}
+
+a:hover {
+  opacity: 0.85;
+}
+
+/* BUTTONS */
+button {
+  border: none;
+  cursor: pointer;
+  border-radius: 8px;
+  padding: 16px 34px;
+  font-size: 18px;
+  font-weight: 700;
+  font-family: var(--sans);
+  transition: all 0.25s ease;
+  box-shadow: var(--shadow);
+  background: white;
+  color: #0052cc;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  opacity: 0.95;
+}
+
+/* INPUTS */
+input, textarea, select {
+  width: 100%;
+  padding: 15px 18px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 16px;
+  font-family: var(--sans);
+  backdrop-filter: blur(10px);
+  box-sizing: border-box;
+}
+
+input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* CARDS */
+.card {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+}
+
+/* CODE */
+code {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-family: var(--mono);
+}
+
+/* HR */
+hr {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  margin: 24px 0;
+}
+
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+  h1 { font-size: 58px; }
+  p { font-size: 18px; }
+}
+
+@media (max-width: 768px) {
+  h1 { font-size: 42px; }
+  h2 { font-size: 28px; }
+  p { font-size: 16px; }
+
+  button {
+    width: 100%;
+  }
+}
