@@ -17,12 +17,15 @@ export default function Login() {
 
     setIsLoading(true);
     try {
-      // Simulate API call
+      // Simulate API call - in a real app, this would connect to your backend
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // On success, redirect to home or dashboard
+
+      // On success, save basic login state and redirect to chat
+      localStorage.setItem('quickchatLoggedIn', 'true');
+      localStorage.setItem('quickchatUser', email);
+      localStorage.setItem('username', email.split('@')[0]); // Use email prefix as username
       alert(`Login successful! Welcome ${email}`);
-      navigate('/');
+      navigate('/chat');
     } catch (error) {
       alert('Login failed. Please try again.');
     } finally {
