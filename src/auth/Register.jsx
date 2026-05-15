@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "../auth.css";
+//import "../auth.css";
 
 export default function SignUp() {
   const navigate = useNavigate();
