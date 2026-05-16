@@ -10,8 +10,4 @@ export default function MessageItem({ message }) {
       <div className="message-text">{message.text}</div>
     </div>
   );
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 83cd97ecf34d7175d7eb25bd75c2b27de06e99b5

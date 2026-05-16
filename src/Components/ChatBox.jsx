@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import MessageList from "./MessageList.jsx";
 import MessageInput from "./MessageInput.jsx";
-import { getMessages, sendMessage } from "../api/ChatApi";
+import { fetchMessages, sendMessage } from "../api/ChatApi";
 
 export default function ChatBox({ room }) {
   const [messages, setMessages] = useState([]);
@@ -10,7 +10,7 @@ export default function ChatBox({ room }) {
   // FETCH MESSAGES BY ROOM
   // =========================
   const fetchMessages = async () => {
-    const data = await getMessages(room);
+    const data = await fetchMessages(room);
     setMessages(data);
   };
 
