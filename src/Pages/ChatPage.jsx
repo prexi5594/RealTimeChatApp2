@@ -139,9 +139,9 @@ function ChatRooms() {
 
   }, [selectedRoom]);
 
-  // =========================
+  
   // JOIN ROOM
-  // =========================
+ 
   const handleJoinRoom = roomId => {
 
     if (!joinedRooms.includes(roomId)) {
@@ -155,9 +155,9 @@ function ChatRooms() {
     setSelectedRoom(roomId);
   };
 
-  // =========================
+  
   // LEAVE ROOM
-  // =========================
+
   const handleLeaveRoom = roomId => {
 
     const updatedRooms =
@@ -175,9 +175,7 @@ function ChatRooms() {
     }
   };
 
-  // =========================
-  // UI
-  // =========================
+  
   return (
     <div className="h-screen bg-white flex flex-col">
 
@@ -290,7 +288,7 @@ function ChatRooms() {
               </div>
             )}
 
-            {/* AVAILABLE ROOMS */}
+            {}
             <div>
 
               <div className="px-4 py-2 text-xs font-bold text-gray-700 uppercase">
@@ -341,7 +339,7 @@ function ChatRooms() {
           </div>
         </div>
 
-        {/* CHAT WINDOW */}
+        {}
         {selectedChatRoom && (
 
           <div className="flex-1 flex flex-col bg-white">
