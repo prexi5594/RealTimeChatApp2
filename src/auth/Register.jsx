@@ -4,29 +4,47 @@ import { Link, useNavigate } from "react-router-dom";
 
 export default function SignUp() {
   const navigate = useNavigate();
-
-  const [username, setUsername] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleRegister = async (e) => {
     e.preventDefault();
 
-    if (!username || !password) {
+    if (!fullName || !email || !password) {
       alert("Please fill in all fields");
       return;
     }
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const res = await fetch("http://localhost:5000/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fullName,
+          email,
+          password,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.message || "Registration failed");
+        return;
+      }
 
       alert("Registration successful!");
 
-      localStorage.setItem("username", username);
+      localStorage.setItem("email", email);
 
       navigate("/login");
+
     } catch (error) {
       console.error(error);
-      alert("Registration failed");
+      alert("Server error. Please check backend.");
     }
   };
 
@@ -40,6 +58,7 @@ export default function SignUp() {
             </div>
             <span className="text-xl font-bold">Quickchat</span>
           </div>
+
           <div className="flex gap-4">
             <Link to="/login" className="px-6 py-2 bg-white text-[#0052CC] rounded font-semibold hover:bg-gray-100 transition">
               Login
@@ -54,7 +73,9 @@ export default function SignUp() {
       <div className="bg-gradient-to-r from-[#0052CC] via-[#0052CC] to-[#00B85C] text-white py-16 px-6">
         <div className="max-w-6xl mx-auto text-center">
           <h1 className="text-5xl font-bold mb-4">Welcome to Quickchat</h1>
-          <p className="text-lg text-gray-100">Fast, simple, and secure messaging for everyone</p>
+          <p className="text-lg text-gray-100">
+            Fast, simple, and secure messaging for everyone
+          </p>
         </div>
       </div>
 
@@ -66,15 +87,29 @@ export default function SignUp() {
             </h2>
 
             <form className="space-y-6" onSubmit={handleRegister}>
+              
               <div>
                 <label className="block text-gray-900 font-semibold text-sm mb-3">
-                  Username
+                  Full Name
                 </label>
                 <input
                   type="text"
-                  placeholder="Enter username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="Enter full name"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0052CC] focus:border-transparent placeholder-gray-400"
+                />
+              </div>
+
+              <div>
+                <label className="block text-gray-900 font-semibold text-sm mb-3">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  placeholder="Enter email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0052CC] focus:border-transparent placeholder-gray-400"
                 />
               </div>
@@ -108,6 +143,7 @@ export default function SignUp() {
                 </Link>
               </p>
             </div>
+
           </div>
         </div>
       </div>

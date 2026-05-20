@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 
 export default function MessageInput({ onSend }) {
@@ -11,17 +10,14 @@ export default function MessageInput({ onSend }) {
   };
 
   return (
-    <div className="message-input-row">
+    <div>
       <input
         value={text}
         onChange={(e) => setText(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && handleSend()}
-        placeholder="Type your message..."
-        className="message-input"
+        placeholder="Type message..."
       />
-      <button onClick={handleSend} className="send-button">
-        Send
-      </button>
+      <button onClick={handleSend}>Send</button>
     </div>
   );
 }

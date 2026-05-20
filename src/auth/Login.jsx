@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./auth.css";
+import axios from "axios";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -12,16 +13,34 @@ export default function Login() {
     e.preventDefault();
 
     setIsLoading(true);
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
 
-      localStorage.setItem('quickchatLoggedIn', 'true');
-      localStorage.setItem('quickchatUser', email);
-      localStorage.setItem('username', email.split('@')[0]);
-      alert(`Login successful! Welcome ${email}`);
+
+    try {
+      const res = await axios.post("http://localhost:5000/login", {
+        email,
+        password
+      });
+
+      const token = res.data.token;
+      const user = res.data.user;
+
+      localStorage.setItem("token", token);
+      localStorage.setItem("username", user.username);
+
+
+      alert(`Login successful! Welcome ${user.fullName}`);
+
       navigate('/chat');
+
     } catch (error) {
-      alert('Login failed. Please try again.');
+    console.error(error);
+
+    alert(
+      error.response?.data?.message ||
+      "Login failed. Please try again."
+    );
+
+
     } finally {
       setIsLoading(false);
     }
@@ -87,6 +106,13 @@ export default function Login() {
                 {isLoading ? "Logging in..." : "Login"}
               </button>
             </form>
+
+            <Link
+  to="/forgot-password"
+  className="text-[#0052CC] font-semibold hover:underline text-sm"
+>
+  Forgot Password?
+</Link>
 
             <div className="mt-6 text-center">
               <p className="text-gray-700">

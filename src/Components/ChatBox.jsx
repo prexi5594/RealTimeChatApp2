@@ -1,66 +1,44 @@
 import { useEffect, useState } from "react";
-import MessageList from "./MessageList.jsx";
-import MessageInput from "./MessageInput.jsx";
-import { fetchMessages, sendMessage } from "../api/ChatApi";
+import MessageList from "./MessageList";
+import MessageInput from "./MessageInput";
+import { fetchMessages as getMessages, sendMessage } from "../api/ChatApi";
 
 export default function ChatBox({ room }) {
   const [messages, setMessages] = useState([]);
 
-  // =========================
-  // FETCH MESSAGES BY ROOM
-  // =========================
-  const fetchMessages = async () => {
-    const data = await fetchMessages(room);
+  const loadMessages = async () => {
+    const data = await getMessages(room);
     setMessages(data);
   };
 
-  // =========================
-  // SEND MESSAGE
-  // =========================
   const handleSend = async (text) => {
-    const username = localStorage.getItem("username") || "anonymous";
+    const username = localStorage.getItem("username") || "You";
 
-await sendMessage({
-  room,
-  username,
-  text
-});
+    await sendMessage({
+      room,
+      username,
+      text,
+    });
 
-// refresh immediately
-fetchMessages();
-
-// optional refresh delay (for sync)
-setTimeout(() => {
-  fetchMessages();
-}, 1000);
+    loadMessages();
   };
 
-  // =========================
-  // LOAD + POLLING
-  // =========================
   useEffect(() => {
     if (!room) return;
 
-fetchMessages();
+    loadMessages();
 
-const interval = setInterval(() => {
-  fetchMessages();
-}, 2000); // polling every 2s
+    const interval = setInterval(() => {
+      loadMessages();
+    }, 2000);
 
-return () => clearInterval(interval);
+    return () => clearInterval(interval);
   }, [room]);
 
-  // =========================
-  // UI
-  // =========================
   return (
     <div className="chat-box">
-      <h3>Room: {room}</h3>
-
-  <MessageList messages={messages} />
-
-  <MessageInput onSend={handleSend} />
-</div>
+      <MessageList messages={messages} />
+      <MessageInput onSend={handleSend} />
+    </div>
   );
 }
-
