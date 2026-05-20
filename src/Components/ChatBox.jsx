@@ -6,17 +6,13 @@ import { fetchMessages, sendMessage } from "../api/ChatApi";
 export default function ChatBox({ room }) {
   const [messages, setMessages] = useState([]);
 
-  // =========================
-  // FETCH MESSAGES BY ROOM
-  // =========================
+  
   const fetchMessages = async () => {
     const data = await fetchMessages(room);
     setMessages(data);
   };
 
-  // =========================
-  // SEND MESSAGE
-  // =========================
+ 
   const handleSend = async (text) => {
     const username = localStorage.getItem("username") || "anonymous";
 
@@ -26,18 +22,16 @@ await sendMessage({
   text
 });
 
-// refresh immediately
+
 fetchMessages();
 
-// optional refresh delay (for sync)
+
 setTimeout(() => {
   fetchMessages();
 }, 1000);
   };
 
-  // =========================
-  // LOAD + POLLING
-  // =========================
+
   useEffect(() => {
     if (!room) return;
 
@@ -50,9 +44,7 @@ const interval = setInterval(() => {
 return () => clearInterval(interval);
   }, [room]);
 
-  // =========================
-  // UI
-  // =========================
+  
   return (
     <div className="chat-box">
       <h3>Room: {room}</h3>

@@ -1,47 +1,66 @@
-let mockMessages = {
-  general: [
-    { id: 1, user: "Bot", text: "Welcome to the general chat!" },
-    { id: 2, user: "Bot", text: "Type a message to get started." }
-  ],
-  sports: [
-    { id: 1, user: "Bot", text: "Welcome to the sports chat!" }
-  ],
-  "class-chat": [
-    { id: 1, user: "Bot", text: "Welcome to the class chat!" }
-  ]
-};
+const BASE_URL = "http://localhost:5000";
 
-export const getMessages = async (room) => {
-  await new Promise(resolve => setTimeout(resolve, 300));
-  return mockMessages[room] || [];
-};
+// ======================
+// FETCH MESSAGES
+// GET /messages/<room>
+// ======================
+export async function fetchMessages(room) {
+  try {
+    const response = await fetch(
+      `${BASE_URL}/messages/${room}`
+    );
 
-export const fetchMessages = getMessages;
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(
+        error.error || "Failed to fetch messages"
+      );
+    }
 
-export const sendMessage = async (messageData) => {
-  await new Promise(resolve => setTimeout(resolve, 500));
-
-  const { room, username, text } = messageData;
-
-  const newMessage = {
-    id: Date.now(),
-    user: username,
-    text: text
-  };
-
-  if (!mockMessages[room]) {
-    mockMessages[room] = [];
+    return await response.json();
+  } catch (error) {
+    console.error("fetchMessages error:", error);
+    throw error;
   }
-  mockMessages[room].push(newMessage);
+}
 
-  setTimeout(() => {
-    const botResponse = {
-      id: Date.now() + 1,
-      user: "Bot",
-      text: `Thanks for your message: "${text}"`
-    };
-    mockMessages[room].push(botResponse);
-  }, 1500);
+// ======================
+// SEND MESSAGE
+// POST /messages
+// ======================
+export async function sendMessage(data) {
+  try {
+    const response = await fetch(
+      `${BASE_URL}/messages`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          message: data.message,
+          username: data.username,
+          room: data.room
+        })
+      }
+    );
 
-  return { success: true };
-};
+    if (!response.ok) {
+      const errorData = await response.json();
+
+      console.error(
+        "Backend error:",
+        errorData
+      );
+
+      throw new Error(
+        errorData.error || "Failed to send message"
+      );
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("sendMessage error:", error);
+    throw error;
+  }
+}
