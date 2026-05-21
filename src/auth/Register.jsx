@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 export default function SignUp() {
   const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -11,7 +12,8 @@ export default function SignUp() {
   const handleRegister = async (e) => {
     e.preventDefault();
 
-    if (!username || !email || !password) {
+  
+    if (!email || !username || !password) {
       alert("Please fill in all fields");
       return;
     }
@@ -25,9 +27,9 @@ export default function SignUp() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username: username,
-          email: email,
-          password: password,
+          email,
+          username,
+          password,
         }),
       });
 
@@ -55,8 +57,11 @@ export default function SignUp() {
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
+
+      {}
       <header className="bg-gradient-to-r from-[#0052CC] to-[#0052CC] text-white py-4 px-6">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
+
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-white rounded flex items-center justify-center">
               <span className="text-[#0052CC] font-bold text-lg">Q</span>
@@ -72,9 +77,11 @@ export default function SignUp() {
               Sign Up
             </Link>
           </div>
+
         </div>
       </header>
 
+      {}
       <div className="bg-gradient-to-r from-[#0052CC] via-[#0052CC] to-[#00B85C] text-white py-16 px-6 text-center">
         <h1 className="text-5xl font-bold mb-4">Welcome to Quickchat</h1>
         <p className="text-lg text-gray-100">
@@ -82,13 +89,17 @@ export default function SignUp() {
         </p>
       </div>
 
+      {}
       <div className="flex-1 bg-white px-6 py-12">
         <div className="max-w-md mx-auto border-4 border-[#0052CC] rounded-2xl p-8">
+
           <h2 className="text-3xl font-bold text-[#0052CC] text-center mb-8">
             Create Your Account
           </h2>
 
           <form onSubmit={handleRegister} className="space-y-6">
+
+            {}
             <input
               type="text"
               placeholder="Enter username"
@@ -97,6 +108,7 @@ export default function SignUp() {
               className="w-full px-4 py-3 border rounded-lg"
             />
 
+            {}
             <input
               type="email"
               placeholder="Enter email"
@@ -105,6 +117,7 @@ export default function SignUp() {
               className="w-full px-4 py-3 border rounded-lg"
             />
 
+            {}
             <input
               type="password"
               placeholder="Create password"
@@ -113,6 +126,7 @@ export default function SignUp() {
               className="w-full px-4 py-3 border rounded-lg"
             />
 
+            {}
             <button
               type="submit"
               disabled={loading}
@@ -120,6 +134,7 @@ export default function SignUp() {
             >
               {loading ? "Registering..." : "Sign Up"}
             </button>
+
           </form>
 
           <p className="text-center mt-6">
@@ -128,6 +143,7 @@ export default function SignUp() {
               Login
             </Link>
           </p>
+
         </div>
       </div>
     </div>

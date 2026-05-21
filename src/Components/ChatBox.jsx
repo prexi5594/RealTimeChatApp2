@@ -1,58 +1,56 @@
 import { useEffect, useState } from "react";
-import MessageList from "./MessageList.jsx";
-import MessageInput from "./MessageInput.jsx";
+import MessageList from "./MessageList";
+import MessageInput from "./MessageInput";
 import { fetchMessages, sendMessage } from "../api/ChatApi";
 
 export default function ChatBox({ room }) {
   const [messages, setMessages] = useState([]);
 
-  
-  const fetchMessages = async () => {
-    const data = await fetchMessages(room);
-    setMessages(data);
+
+  const loadMessages = async () => {
+    if (!room) return;
+
+    try {
+      const data = await fetchMessages(room);
+      setMessages(Array.isArray(data) ? data : data.messages || []);
+    } catch (err) {
+      console.log("Error loading messages:", err);
+    }
   };
 
- 
   const handleSend = async (text) => {
-    const username = localStorage.getItem("username") || "anonymous";
+    const username = localStorage.getItem("username") || "You";
 
-await sendMessage({
-  room,
-  username,
-  text
-});
+    try {
+      await sendMessage({
+        room,
+        username,
+        message: text, // IMPORTANT: backend expects "message"
+      });
 
-
-fetchMessages();
-
-
-setTimeout(() => {
-  fetchMessages();
-}, 1000);
+      loadMessages(); // refresh after sending
+    } catch (err) {
+      console.log("Error sending message:", err);
+    }
   };
 
 
   useEffect(() => {
     if (!room) return;
 
-fetchMessages();
+    loadMessages();
 
-const interval = setInterval(() => {
-  fetchMessages();
-}, 2000); // polling every 2s
+    const interval = setInterval(() => {
+      loadMessages();
+    }, 2000);
 
-return () => clearInterval(interval);
+    return () => clearInterval(interval);
   }, [room]);
 
-  
   return (
     <div className="chat-box">
-      <h3>Room: {room}</h3>
-
-  <MessageList messages={messages} />
-
-  <MessageInput onSend={handleSend} />
-</div>
+      <MessageList messages={messages} />
+      <MessageInput onSend={handleSend} />
+    </div>
   );
 }
-

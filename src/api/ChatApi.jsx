@@ -1,9 +1,6 @@
+
 const BASE_URL = "http://localhost:5000";
 
-// ======================
-// FETCH MESSAGES
-// GET /messages/<room>
-// ======================
 export async function fetchMessages(room) {
   try {
     const response = await fetch(
@@ -24,10 +21,7 @@ export async function fetchMessages(room) {
   }
 }
 
-// ======================
-// SEND MESSAGE
-// POST /messages
-// ======================
+
 export async function sendMessage(data) {
   try {
     const response = await fetch(
