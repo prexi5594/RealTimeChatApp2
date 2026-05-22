@@ -1,5 +1,5 @@
 
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = "https://realtimechatappbackend-zhb5.onrender.com";
 
 export async function fetchMessages(room) {
   try {
