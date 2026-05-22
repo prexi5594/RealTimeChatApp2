@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 function Home() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      {/* Header */}
+      {}
       <header className="bg-gradient-to-r from-[#0052CC] to-[#0052CC] text-white py-4 px-6">
         <div className="max-w-6xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-2">
@@ -29,7 +29,7 @@ function Home() {
         </div>
       </header>
 
-      {/* Hero Section */}
+      {}
       <div className="bg-gradient-to-r from-[#0052CC] via-[#0052CC] to-[#00B85C] text-white py-32 px-6">
         <div className="max-w-6xl mx-auto text-center">
           <h1 className="text-5xl md:text-6xl font-bold mb-6">Welcome to Quickchat</h1>
@@ -51,7 +51,7 @@ function Home() {
         </div>
       </div>
 
-      {/* Features Section */}
+      {}
       <div className="bg-white py-20 px-6">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold text-center text-gray-900 mb-16">Why Choose Quickchat?</h2>
@@ -81,7 +81,7 @@ function Home() {
         </div>
       </div>
 
-      {/* CTA Section */}
+      {}
       <div className="bg-gradient-to-r from-[#0052CC] to-[#00B85C] text-white py-16 px-6">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-4xl font-bold mb-6">Ready to chat?</h2>

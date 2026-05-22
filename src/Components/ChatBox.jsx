@@ -25,10 +25,10 @@ export default function ChatBox({ room }) {
       await sendMessage({
         room,
         username,
-        message: text, // IMPORTANT: backend expects "message"
+        message: text, 
       });
 
-      loadMessages(); // refresh after sending
+      loadMessages();
     } catch (err) {
       console.log("Error sending message:", err);
     }
