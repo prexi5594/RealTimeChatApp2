@@ -4,7 +4,6 @@ import { Link, useNavigate } from "react-router-dom";
 export default function Login() {
   const navigate = useNavigate();
 
-
   const [email, setEmail] =
     useState("");
 
@@ -14,79 +13,138 @@ export default function Login() {
   const [isLoading, setIsLoading] =
     useState(false);
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  const handleLogin =
+    async (e) => {
 
-    if (
-      !email.trim() ||
-      !password.trim()
-    ) {
-      alert("Please fill in all fields");
-      return;
-    }
+      e.preventDefault();
 
-    setIsLoading(true);
-
-    try {
-
-      const response =
-        await fetch(
-          "https://realtimechatappbackend-zhb5.onrender.com/login",
-          {
-            method: "POST",
-
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-
-            body: JSON.stringify({
-  email,
-  password,
-}),
-          }
-        );
-
-      const data =
-        await response.json();
-
-      console.log(data);
-
-      if (!response.ok) {
+      if (
+        !email.trim() ||
+        !password.trim()
+      ) {
         alert(
-          data.error ||
-          "Login failed"
+          "Please fill in all fields"
         );
 
         return;
       }
 
-      localStorage.setItem(
-        "username",
-        data.user.username);
-        localStorage.setItem("email", data.user.email);
-    
-
-      alert(
-        "Login successful"
+      setIsLoading(
+        true
       );
 
-      navigate("/chat");
+      try {
 
-    } catch (error) {
+        const res =
+          await fetch(
+            "https://realtimechatappbackend-zhb5.onrender.com/login",
+            {
+              method:
+                "POST",
 
-      console.error(error);
+              headers: {
+                "Content-Type":
+                  "application/json",
+              },
 
-      alert(
-        "Cannot connect to backend"
-      );
+              body:
+                JSON.stringify({
+                  email,
+                  password,
+                }),
+            }
+          );
 
-    } finally {
+        const data =
+          await res.json();
 
-      setIsLoading(false);
+        console.log(
+          data
+        );
 
-    }
-  };
+        if (
+          !res.ok
+        ) {
+          alert(
+            data.error ||
+            "Login failed"
+          );
+
+          return;
+        }
+
+        /*
+        SAVE TOKEN
+        */
+
+        localStorage.setItem(
+          "token",
+          data.token
+        );
+
+        localStorage.setItem(
+          "user",
+          JSON.stringify(
+            data.user
+          )
+        );
+
+        localStorage.setItem(
+          "username",
+          data.user.username
+        );
+
+        localStorage.setItem(
+          "email",
+          data.user.email
+        );
+
+        alert(
+          "Login successful"
+        );
+
+        /*
+        ADMIN → DASHBOARD
+        USER → CHAT
+        */
+
+        if (
+          data.user.role ===
+          "admin"
+        ) {
+
+          navigate(
+            "/admin"
+          );
+
+        } else {
+
+          navigate(
+            "/chat"
+          );
+
+        }
+
+      } catch (
+        error
+      ) {
+
+        console.error(
+          error
+        );
+
+        alert(
+          "Cannot connect to backend"
+        );
+
+      } finally {
+
+        setIsLoading(
+          false
+        );
+
+      }
+    };
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
@@ -126,23 +184,27 @@ export default function Login() {
         <div className="border-4 border-[#0052CC] rounded-2xl p-8 w-full max-w-md">
 
           <h2 className="text-3xl text-center mb-8">
-
             Login
-
           </h2>
 
           <form
-            onSubmit={handleLogin}
+            onSubmit={
+              handleLogin
+            }
             className="space-y-4"
           >
 
             <input
-  type="email"
-  placeholder="Email"
-  value={email}
-  onChange={(e) => setEmail(e.target.value)}
-  className="w-full border p-3 rounded"
-/>
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) =>
+                setEmail(
+                  e.target.value
+                )
+              }
+              className="w-full border p-3 rounded"
+            />
 
             <input
               type="password"
@@ -158,7 +220,9 @@ export default function Login() {
 
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={
+                isLoading
+              }
               className="w-full bg-[#0052CC] text-white p-3 rounded"
             >
               {
