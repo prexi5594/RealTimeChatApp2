@@ -54,7 +54,7 @@ export default function SignUp() {
       try {
         const res =
           await fetch(
-            "https://realtimechatappbackend-zhb5.onrender.com/register",
+            "http://172.28.42.45:5000/register",
             {
               method:
                 "POST",

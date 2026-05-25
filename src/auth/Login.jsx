@@ -37,7 +37,7 @@ export default function Login() {
 
         const res =
           await fetch(
-            "https://realtimechatappbackend-zhb5.onrender.com/login",
+            " http://172.28.42.45:5000/login",
             {
               method:
                 "POST",
@@ -58,18 +58,11 @@ export default function Login() {
         const data =
           await res.json();
 
-        console.log(
-          data
-        );
-
+        console.log("LOGIN RESPONSE:", response.data);
         if (
           !res.ok
-        ) {
-          alert(
-            data.error ||
-            "Login failed"
-          );
-
+        ) {console.log("Login failed:", data);
+          
           return;
         }
 
@@ -90,9 +83,9 @@ export default function Login() {
         );
 
         localStorage.setItem(
-          "username",
-          data.user.username
-        );
+  "username",
+  data.user.username || data.user.email.split("@")[0]
+);
 
         localStorage.setItem(
           "email",

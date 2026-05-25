@@ -7,12 +7,16 @@ import {
   Hash,
   Plus,
   LogOut,
+  MoreVertical,
 } from 'lucide-react';
 
 import {
   fetchMessages,
   sendMessage,
 } from '../api/ChatApi';
+import { createChatRoom } from '../api/ChatApi';
+import { deleteChatRoom } from '../api/ChatApi';
+import { deleteMessage } from '../api/ChatApi';
 
 function ChatRooms() {
 
@@ -28,6 +32,19 @@ function ChatRooms() {
 
   const [messages, setMessages] =
     useState([]);
+
+  const [showModal, setShowModal] = useState(false);
+
+  const [customRooms, setCustomRooms] = useState([]); 
+
+  const [newRoomName, setNewRoomName] = useState('');
+
+  const [newRoomTopic, setNewRoomTopic] = useState('');
+
+  const [newRoomDescription, setNewRoomDescription] = useState('');
+
+  const [showRoomMenu, setShowRoomMenu] = useState(false);
+
 
   const chatRooms = [
     {
@@ -61,11 +78,18 @@ function ChatRooms() {
 
   ];
 
+  
   // =========================
   // CURRENT ROOM
   // =========================
+  
+  const allRooms = [
+  ...chatRooms,
+  ...customRooms,
+    ];
+
   const selectedChatRoom =
-    chatRooms.find(
+    allRooms.find(
       room => room.id === selectedRoom
     );
 
@@ -78,9 +102,7 @@ function ChatRooms() {
 
     try {
 
-      const data = await fetchMessages(
-        selectedChatRoom.name
-      );
+      const data = await fetchMessages(selectedChatRoom.name.toLowerCase());
 
       setMessages(Array.isArray(data) ? data : data.messages || []);
     } catch (error) {
@@ -106,13 +128,11 @@ function ChatRooms() {
 
       await sendMessage({
   username,
-  room: selectedChatRoom.name,
+  room: selectedChatRoom.name.toLowerCase(),
   message: messageInput,
       });
 
       setMessageInput('');
-
-      // refresh instantly
       loadMessages();
 
     } catch (error) {
@@ -128,16 +148,29 @@ function ChatRooms() {
   // POLLING
   // =========================
   useEffect(() => {
+  setMessages([]); //  CLEAR OLD ROOM MESSAGES FIRST
 
+  loadMessages();
+
+  const interval = setInterval(() => {
     loadMessages();
+  }, 2000);
 
-    const interval = setInterval(() => {
-      loadMessages();
-    }, 2000);
+  return () => clearInterval(interval);
 
-    return () => clearInterval(interval);
+  const handleClickOutside = () => {
+    setShowRoomMenu(false);
+  };
 
-  }, [selectedRoom]);
+  if (showRoomMenu) {
+    window.addEventListener('click', handleClickOutside);
+  }
+
+  return () => {
+    window.removeEventListener('click', handleClickOutside);
+  };
+
+}, [selectedRoom]);
 
   
   // JOIN ROOM
@@ -174,6 +207,74 @@ function ChatRooms() {
       setSelectedRoom(updatedRooms[0]);
     }
   };
+
+  //CREATE ROOM HANDLER
+  
+  const handleCreateRoom = async () => {
+
+  if (!newRoomName.trim()) {
+    alert("Room name is required");
+    return;
+  }
+
+  const newRoom = {
+    id: Date.now(),
+    name: newRoomName,
+    topic: newRoomTopic,
+    description: newRoomDescription,
+    icon: "💬",
+    members: 1,
+  };
+
+  setCustomRooms([
+    ...customRooms,
+    newRoom
+  ]);
+
+  setJoinedRooms([
+    ...joinedRooms,
+    newRoom.id
+  ]);
+
+  setSelectedRoom(newRoom.id);
+
+  setShowModal(false);
+
+  setNewRoomName('');
+  setNewRoomTopic('');
+  setNewRoomDescription('');
+};
+
+const handleDeleteRoom = (roomId) => {
+
+  // remove room from custom rooms
+  const updatedRooms =
+    customRooms.filter(
+      room => room.id !== roomId
+    );
+
+  setCustomRooms(updatedRooms);
+
+  // remove joined state
+  const updatedJoined =
+    joinedRooms.filter(
+      id => id !== roomId
+    );
+
+  setJoinedRooms(updatedJoined);
+
+  // switch to first room
+  setSelectedRoom(1);
+};
+
+const handleDeleteMessage = async (messageId) => {
+  try {
+    await deleteMessage(messageId);
+    loadMessages(); // refresh chat
+  } catch (err) {
+    console.log("Delete error:", err);
+  }
+};
 
   
   return (
@@ -221,7 +322,13 @@ function ChatRooms() {
                 Chat Rooms
               </h2>
 
-              <button className="p-1 hover:bg-gray-100 rounded-lg transition">
+              
+                <button
+                  onClick={() =>
+                    setShowModal(true)
+                  }
+                  className="p-1 hover:bg-gray-100 rounded-lg transition"
+                >
                 <Plus
                   size={20}
                   className="text-[#0052CC]"
@@ -245,14 +352,14 @@ function ChatRooms() {
                   Joined Rooms
                 </div>
 
-                {chatRooms
+                {allRooms
                   .filter(room =>
                     joinedRooms.includes(room.id)
                   )
                   .map(room => (
 
                     <button
-                      key={room.id}
+                      key={`${room.id}-${room.name}`}
 
                       onClick={() =>
                         setSelectedRoom(room.id)
@@ -295,14 +402,14 @@ function ChatRooms() {
                 Available Rooms
               </div>
 
-              {chatRooms
+              {allRooms
                 .filter(room =>
                   !joinedRooms.includes(room.id)
                 )
                 .map(room => (
 
                   <button
-                    key={room.id}
+                    key={`${room.id}-${room.name}`}
 
                     onClick={() =>
                       handleJoinRoom(room.id)
@@ -373,28 +480,67 @@ function ChatRooms() {
                 </div>
               </div>
 
-              {joinedRooms.includes(
-                selectedChatRoom.id
-              ) && (
+              {joinedRooms.includes(selectedChatRoom.id) && (
+  <div className="relative">
 
-                <button
-                  onClick={() =>
-                    handleLeaveRoom(
-                      selectedChatRoom.id
-                    )
-                  }
+    {/* 3-dot button */}
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        setShowRoomMenu(prev => !prev);
+      }}
+      className="p-2 rounded hover:bg-gray-100"
+    >
+      <MoreVertical size={20} />
+    </button>
 
-                  className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition text-sm font-semibold"
-                >
-                  Leave Room
-                </button>
-              )}
+    {/* Dropdown */}
+    {showRoomMenu && (
+      <div
+        className="absolute right-0 mt-2 w-40 bg-white border rounded-lg shadow-lg z-50"
+        onClick={(e) => e.stopPropagation()}
+      >
+
+        {/* Leave Room */}
+        <button
+          onClick={() => {
+            handleLeaveRoom(selectedChatRoom.id);
+            setShowRoomMenu(false);
+          }}
+          className="w-full text-left px-4 py-2 hover:bg-gray-100 text-sm"
+        >
+          Leave Room
+        </button>
+
+        {/* Delete Room (only custom rooms) */}
+        {customRooms.some(
+          room => room.id === selectedChatRoom.id
+        ) && (
+          <button
+            onClick={() => {
+              handleDeleteRoom(selectedChatRoom.id);
+              setShowRoomMenu(false);
+            }}
+            className="w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-blue-100"
+          >
+            Delete Room
+          </button>
+        )}
+
+      </div>
+    )}
+
+  </div>
+)}
+
+                
             </div>
 
             {/* MESSAGES */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
 
               {messages.map(msg => (
+                
 
                 <div
                   key={msg.id}
@@ -429,8 +575,15 @@ function ChatRooms() {
                       </span>
                     </div>
 
-                    <p className="text-gray-700 mt-1">
-                      {msg.message}
+                    <p
+  className={`mt-1 ${
+    msg.isDeleted
+      ? "text-gray-400 italic"
+      : "text-gray-700"
+  }`}
+>
+  {msg.isDeleted ? "Message deleted" : msg.message}
+
                     </p>
                   </div>
                 </div>
@@ -475,8 +628,70 @@ function ChatRooms() {
           </div>
         )}
       </div>
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+
+          <div className="bg-white p-6 rounded-xl w-96 shadow-xl">
+
+            <h2 className="text-2xl font-bold mb-4">
+              Create Chat Room
+            </h2>
+
+            <input
+              type="text"
+              placeholder="Room Name"
+              value={newRoomName}
+              onChange={(e) =>
+                setNewRoomName(e.target.value)
+              }
+              className="w-full border p-3 rounded mb-3"
+            />
+
+            <input
+              type="text"
+              placeholder="Topic"
+              value={newRoomTopic}
+              onChange={(e) =>
+                setNewRoomTopic(e.target.value)
+              }
+              className="w-full border p-3 rounded mb-3"
+            />
+
+            <textarea
+              placeholder="Description"
+              value={newRoomDescription}
+              onChange={(e) =>
+                setNewRoomDescription(e.target.value)
+              }
+              className="w-full border p-3 rounded mb-4"
+            />
+
+            <div className="flex justify-end gap-2">
+
+              <button
+                onClick={() =>
+                  setShowModal(false)
+                }
+                className="px-4 py-2 bg-gray-300 rounded"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={handleCreateRoom}
+                className="px-4 py-2 bg-[#0052CC] text-white rounded"
+              >
+                Create
+              </button>
+
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
+
 
 export default ChatRooms;

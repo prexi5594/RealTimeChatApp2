@@ -1,5 +1,5 @@
 
-const BASE_URL = "https://realtimechatappbackend-zhb5.onrender.com";
+const BASE_URL = " http://172.28.42.45:5000";
 
 export async function fetchMessages(room) {
   try {
@@ -58,3 +58,106 @@ export async function sendMessage(data) {
     throw error;
   }
 }
+
+export async function createChatRoom(roomData) {
+  try {
+    const response = await fetch(
+      "http://172.28.42.45:5000/rooms",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(roomData)
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(
+        errorData.error || "Failed to create chat room"
+      );
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("createChatRoom error:", error);
+    throw error;
+  }
+}
+
+export async function deleteChatRoom(roomId) {
+  try {
+    const response = await fetch(
+      `http://172.28.42.45:5000/rooms/${roomId}`,
+      {
+        method: "DELETE"
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(
+        errorData.error || "Failed to delete chat room"
+      );
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("deleteChatRoom error:", error);
+    throw error;
+  }
+}
+
+export async function fetchChatRooms() {
+  try {
+    const response = await fetch(
+      "http://172.28.42.45:5000/rooms"
+    );
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(
+        error.error || "Failed to fetch chat rooms"
+      );
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("fetchChatRooms error:", error);
+    throw error;
+  }
+}
+
+
+export async function fetchChatRoomDetails(roomId) {
+  try {
+    const response = await fetch(
+      `http://172.28.42.45:5000/rooms/${roomId}`
+    );
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(
+        error.error || "Failed to fetch chat room details"
+      );
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("fetchChatRoomDetails error:", error);
+    throw error;
+  }
+}
+
+
+export const deleteMessage = async (messageId) => {
+  const res = await fetch(`/messages/${messageId}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json"
+    }
+  });
+
+  return res.json();
+};
