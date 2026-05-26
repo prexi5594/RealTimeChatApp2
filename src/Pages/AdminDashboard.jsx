@@ -11,13 +11,14 @@ export default function AdminDashboard() {
   // ======================
   // AUTH CHECK (ADMIN ONLY)
   // ======================
-  const user = JSON.parse(localStorage.getItem("user"));
-
   useEffect(() => {
-    if (!user || user.role !== "admin") {
-      navigate("/chat");
-    }
-  }, [navigate, user]);
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+
+  if (!storedUser || storedUser.role !== "admin") {
+    navigate("/chat");
+  }
+}, [navigate]);
+
 
   // ======================
   // STATE
