@@ -1,5 +1,5 @@
 
-const BASE_URL = " http://172.28.42.45:5000";
+const BASE_URL = "http://localhost:5000";
 
 export async function fetchMessages(room) {
   try {
@@ -152,12 +152,15 @@ export async function fetchChatRoomDetails(roomId) {
 
 
 export const deleteMessage = async (messageId) => {
-  const res = await fetch(`/messages/${messageId}`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json"
+  const res = await fetch(
+    `${BASE_URL}/messages/${messageId}`,
+    {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json"
+      }
     }
-  });
+  );
 
   return res.json();
 };

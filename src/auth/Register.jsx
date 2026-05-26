@@ -4,164 +4,111 @@ import { Link, useNavigate } from "react-router-dom";
 export default function SignUp() {
   const navigate = useNavigate();
 
-  const [email, setEmail] =
-    useState("");
+  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const [username, setUsername] =
-    useState("");
-
-  const [password, setPassword] =
-    useState("");
-
-  const [loading, setLoading] =
-    useState(false);
-
-  const validateEmail = (
-    email
-  ) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-      .test(email);
+  const validateEmail = (email) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
 
-  const handleRegister =
-    async (e) => {
-      e.preventDefault();
+  const handleRegister = async (e) => {
+    e.preventDefault();
 
-      if (
-        !email ||
-        !username ||
-        !password
-      ) {
-        alert(
-          "Please fill in all fields"
-        );
+    if (!email || !username || !password) {
+      alert("Please fill in all fields");
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      alert("Enter a valid email address");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      // Step 1: Submit signup form to register user and send email
+      const res = await fetch("http://localhost:5000/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          username,
+          password,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error || "Registration failed");
         return;
       }
 
-      if (
-        !validateEmail(
-          email
-        )
-      ) {
-        alert(
-          "Enter a valid email address"
-        );
-        return;
-      }
+      // Step 2: Show popup demanding the 6-digit code sent to their email
+      const userEnteredCode = prompt(
+        "Registration successful! Please check your inbox and enter the 6-digit verification code:"
+      );
 
-      setLoading(true);
+      if (userEnteredCode) {
+        // Step 3: Send code to backend verify-otp route
+        const verifyRes = await fetch("http://localhost:5000/verify-otp", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email,
+            code: userEnteredCode,
+          }),
+        });
 
-      try {
-        const res =
-          await fetch(
-            "http://172.28.42.45:5000/register",
-            {
-              method:
-                "POST",
+        const verifyData = await verifyRes.json();
 
-              headers: {
-                "Content-Type":
-                  "application/json",
-              },
-
-              body:
-                JSON.stringify(
-                  {
-                    email,
-                    username,
-                    password,
-                  }
-                ),
-            }
-          );
-
-        const data =
-          await res.json();
-
-        if (
-          !res.ok
-        ) {
-          alert(
-            data.error ||
-              "Registration failed"
-          );
-
-          return;
+        if (verifyRes.ok) {
+          alert("Email verification successful! Redirecting to login...");
+          localStorage.setItem("username", username);
+          navigate("/login");
+        } else {
+          alert(verifyData.error || "Invalid code. Please try registering again or log in to resend.");
         }
-
-        alert(
-          "Registration successful!"
-        );
-
-        localStorage.setItem(
-          "username",
-          username
-        );
-
-        navigate(
-          "/login"
-        );
-      } catch (
-        error
-      ) {
-        console.error(
-          error
-        );
-
-        alert(
-          "Server error"
-        );
-      } finally {
-        setLoading(
-          false
-        );
+      } else {
+        alert("Account created but unverified. Please log in to complete verification.");
+        navigate("/login");
       }
-    };
+
+    } catch (error) {
+      console.error("Signup network crash details:", error);
+      alert("Server error: Could not reach backend");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
-
       <header className="bg-[#0052CC] text-white py-4 px-6">
         <div className="max-w-6xl mx-auto flex justify-between">
-
-          <h1 className="text-2xl font-bold">
-            Quickchat
-          </h1>
-
-          <Link
-            to="/login"
-            className="bg-white text-[#0052CC] px-4 py-2 rounded"
-          >
+          <h1 className="text-2xl font-bold">Quickchat</h1>
+          <Link to="/login" className="bg-white text-[#0052CC] px-4 py-2 rounded">
             Login
           </Link>
-
         </div>
       </header>
 
       <div className="flex-1 flex justify-center items-center">
-
         <div className="w-full max-w-md border p-8 rounded-xl">
-
-          <h2 className="text-3xl text-center font-bold mb-6">
-            Sign Up
-          </h2>
-
-          <form
-            onSubmit={
-              handleRegister
-            }
-            className="space-y-4"
-          >
-
+          <h2 className="text-3xl text-center font-bold mb-6">Sign Up</h2>
+          <form onSubmit={handleRegister} className="space-y-4">
             <input
               type="text"
               placeholder="Username"
               value={username}
-              onChange={(e) =>
-                setUsername(
-                  e.target.value
-                )
-              }
+              onChange={(e) => setUsername(e.target.value)}
               className="w-full border p-3 rounded"
             />
 
@@ -169,11 +116,7 @@ export default function SignUp() {
               type="email"
               placeholder="Email"
               value={email}
-              onChange={(e) =>
-                setEmail(
-                  e.target.value
-                )
-              }
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full border p-3 rounded"
             />
 
@@ -181,32 +124,20 @@ export default function SignUp() {
               type="password"
               placeholder="Password"
               value={password}
-              onChange={(e) =>
-                setPassword(
-                  e.target.value
-                )
-              }
+              onChange={(e) => setPassword(e.target.value)}
               className="w-full border p-3 rounded"
             />
 
             <button
               type="submit"
-              disabled={
-                loading
-              }
+              disabled={loading}
               className="w-full bg-green-600 text-white p-3 rounded"
             >
-              {loading
-                ? "Registering..."
-                : "Sign Up"}
+              {loading ? "Registering..." : "Sign Up"}
             </button>
-
           </form>
-
         </div>
-
       </div>
-
     </div>
   );
 }

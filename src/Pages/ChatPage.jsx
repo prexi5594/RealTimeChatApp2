@@ -45,8 +45,23 @@ function ChatRooms() {
 
   const [showRoomMenu, setShowRoomMenu] = useState(false);
 
+  const [selectedMessageID, setSelectedMessageID] = useState(null);
+
+  const [showMessageMenu, setShowMessageMenu] = useState(false);
+
+
+  const DEFAULT_ROOM = {
+  id: 0,
+  name: "General",
+  topic: "Welcome",
+  icon: "🏠",
+  description: "Say hi, meet people, and start conversations"
+};
+
 
   const chatRooms = [
+    
+     
     {
       id: 1,
       name: 'Sports',
@@ -86,6 +101,7 @@ function ChatRooms() {
   const allRooms = [
   ...chatRooms,
   ...customRooms,
+  DEFAULT_ROOM
     ];
 
   const selectedChatRoom =
@@ -191,23 +207,20 @@ function ChatRooms() {
   
   // LEAVE ROOM
 
-  const handleLeaveRoom = roomId => {
+  const handleLeaveRoom = (roomId) => {
+  const updatedRooms = joinedRooms.filter(id => id !== roomId);
 
-    const updatedRooms =
-      joinedRooms.filter(
-        id => id !== roomId
-      );
+  setJoinedRooms(updatedRooms);
 
-    setJoinedRooms(updatedRooms);
+  if (updatedRooms.length === 0) {
+    setSelectedRoom(0); // always fallback to General
+    return;
+  }
 
-    if (
-      selectedRoom === roomId &&
-      updatedRooms.length > 0
-    ) {
-      setSelectedRoom(updatedRooms[0]);
-    }
-  };
-
+  if (selectedRoom === roomId) {
+    setSelectedRoom(updatedRooms[0]);
+  }
+};
   //CREATE ROOM HANDLER
   
   const handleCreateRoom = async () => {
@@ -269,12 +282,61 @@ const handleDeleteRoom = (roomId) => {
 
 const handleDeleteMessage = async (messageId) => {
   try {
-    await deleteMessage(messageId);
-    loadMessages(); // refresh chat
+    const idToDelete =
+      messageId ?? selectedMessageID;
+
+    console.log("Deleting message:", idToDelete);
+
+    if (idToDelete === undefined || idToDelete === null) {
+      console.log("No message ID found");
+      return;
+    }
+
+    const response = await deleteMessage(idToDelete);
+    console.log("Delete response:", response);
+
+    
+    setMessages(prevMessages =>
+      prevMessages.map(msg => {
+        const msgId = msg.id ?? msg._id;
+
+        if (msgId === idToDelete) {
+          return {
+            ...msg,
+            message: "Message deleted",
+            isDeleted: true
+          };
+        }
+
+        return msg;
+      })
+    );
+
+    setShowMessageMenu(false);
+    setSelectedMessageID(null);
+
   } catch (err) {
     console.log("Delete error:", err);
   }
 };
+
+
+const handleLongPress = (msgId) => {
+  setSelectedMessageID(msgId);
+  setShowMessageMenu(true);
+};
+
+useEffect(() => {
+  const disableContextMenu = (e) => {
+    e.preventDefault();
+  };
+
+  document.addEventListener("contextmenu", disableContextMenu);
+
+  return () => {
+    document.removeEventListener("contextmenu", disableContextMenu);
+  };
+}, []);
 
   
   return (
@@ -359,7 +421,7 @@ const handleDeleteMessage = async (messageId) => {
                   .map(room => (
 
                     <button
-                      key={`${room.id}-${room.name}`}
+                      key={room.id}
 
                       onClick={() =>
                         setSelectedRoom(room.id)
@@ -409,7 +471,7 @@ const handleDeleteMessage = async (messageId) => {
                 .map(room => (
 
                   <button
-                    key={`${room.id}-${room.name}`}
+                    key={room.id}
 
                     onClick={() =>
                       handleJoinRoom(room.id)
@@ -539,12 +601,13 @@ const handleDeleteMessage = async (messageId) => {
             {/* MESSAGES */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
 
-              {messages.map(msg => (
-                
-
+              {messages.map((msg, index) => (
                 <div
-                  key={msg.id}
-                  className="flex gap-3"
+                 key={msg.id ?? msg._id ?? index}
+                  onContextMenu={() => {
+                  setSelectedMessageID(msg.id ?? msg._id ?? index);
+                  setShowMessageMenu(true);
+                 }}
                 >
 
                   {/* USER ICON */}
@@ -582,6 +645,7 @@ const handleDeleteMessage = async (messageId) => {
       : "text-gray-700"
   }`}
 >
+  
   {msg.isDeleted ? "Message deleted" : msg.message}
 
                     </p>
@@ -627,71 +691,100 @@ const handleDeleteMessage = async (messageId) => {
             </div>
           </div>
         )}
+
+        {/* MESSAGE MENU */}
+{showMessageMenu && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20"
+      onClick={() =>{
+        setShowMessageMenu(false);
+        setSelectedMessageID(null);
+      }}
+      >
+    <div className="bg-white rounded-lg shadow-lg w-40 overflow-hidden"
+         onClick={(e) => e.stopPropagation()}>
+      <button
+  className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50 text-sm"
+  onClick={() => {
+    handleDeleteMessage(selectedMessageID);
+    setShowMessageMenu(false);
+    setSelectedMessageID(null);
+  }}
+>
+  Delete Message
+</button>
+
+      <button
+        className="w-full text-left px-4 py-2 text-gray-600 hover:bg-gray-100 text-sm"
+        onClick={() => {
+          setShowMessageMenu(false);
+          setSelectedMessageID(null);
+        }}
+      >
+        Cancel
+      </button>
+
+    </div>
+  </div>
+)}
+
+{/* CREATE ROOM MODAL */}
+{showModal && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="bg-white p-6 rounded-xl w-96 shadow-xl">
+
+      <h2 className="text-2xl font-bold mb-4">
+        Create Chat Room
+      </h2>
+
+      <input
+        type="text"
+        placeholder="Room Name"
+        value={newRoomName}
+        onChange={(e) => setNewRoomName(e.target.value)}
+        className="w-full border p-3 rounded mb-3"
+      />
+
+      <input
+        type="text"
+        placeholder="Topic"
+        value={newRoomTopic}
+        onChange={(e) => setNewRoomTopic(e.target.value)}
+        className="w-full border p-3 rounded mb-3"
+      />
+
+      <textarea
+        placeholder="Description"
+        value={newRoomDescription}
+        onChange={(e) => setNewRoomDescription(e.target.value)}
+        className="w-full border p-3 rounded mb-4"
+      />
+
+      <div className="flex justify-end gap-2">
+        <button
+          onClick={() => setShowModal(false)}
+          className="px-4 py-2 bg-gray-300 rounded"
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={handleCreateRoom}
+          className="px-4 py-2 bg-[#0052CC] text-white rounded"
+        >
+          Create
+        </button>
       </div>
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    </div>
+  </div>
+)}
 
-          <div className="bg-white p-6 rounded-xl w-96 shadow-xl">
-
-            <h2 className="text-2xl font-bold mb-4">
-              Create Chat Room
-            </h2>
-
-            <input
-              type="text"
-              placeholder="Room Name"
-              value={newRoomName}
-              onChange={(e) =>
-                setNewRoomName(e.target.value)
-              }
-              className="w-full border p-3 rounded mb-3"
-            />
-
-            <input
-              type="text"
-              placeholder="Topic"
-              value={newRoomTopic}
-              onChange={(e) =>
-                setNewRoomTopic(e.target.value)
-              }
-              className="w-full border p-3 rounded mb-3"
-            />
-
-            <textarea
-              placeholder="Description"
-              value={newRoomDescription}
-              onChange={(e) =>
-                setNewRoomDescription(e.target.value)
-              }
-              className="w-full border p-3 rounded mb-4"
-            />
-
-            <div className="flex justify-end gap-2">
-
-              <button
-                onClick={() =>
-                  setShowModal(false)
-                }
-                className="px-4 py-2 bg-gray-300 rounded"
-              >
-                Cancel
-              </button>
-
-              <button
-                onClick={handleCreateRoom}
-                className="px-4 py-2 bg-[#0052CC] text-white rounded"
-              >
-                Create
-              </button>
-
-            </div>
-          </div>
-        </div>
-      )}
-
+      </div>
     </div>
   );
 }
 
+         
+
+    
 
 export default ChatRooms;
