@@ -1,0 +1,132 @@
+/* Admin Dashboard Base */
+.admin-container {
+  padding: 20px;
+  min-height: 100vh;
+  background: #0f172a; /* dark slate */
+  color: #e2e8f0;
+  font-family: Arial, sans-serif;
+}
+
+/* Header */
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.admin-header h1 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #38bdf8;
+}
+
+/* Stats Cards */
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: #1e293b;
+  padding: 15px;
+  border-radius: 10px;
+  text-align: center;
+  border: 1px solid #334155;
+}
+
+.stat-card h3 {
+  font-size: 14px;
+  color: #94a3b8;
+}
+
+.stat-card p {
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: 5px;
+  color: #38bdf8;
+}
+
+/* Moderation Table */
+.moderation-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #1e293b;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.moderation-table th,
+.moderation-table td {
+  padding: 12px;
+  border-bottom: 1px solid #334155;
+  text-align: left;
+}
+
+.moderation-table th {
+  background: #0b1220;
+  color: #94a3b8;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+/* User Row Hover */
+.moderation-table tr:hover {
+  background: #273449;
+}
+
+/* Buttons */
+.btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: 0.2s;
+}
+
+/* Ban button */
+.btn-ban {
+  background: #ef4444;
+  color: white;
+}
+
+.btn-ban:hover {
+  background: #dc2626;
+}
+
+/* Delete button */
+.btn-delete {
+  background: #f97316;
+  color: white;
+}
+
+.btn-delete:hover {
+  background: #ea580c;
+}
+
+/* Neutral button */
+.btn-view {
+  background: #38bdf8;
+  color: #0f172a;
+}
+
+.btn-view:hover {
+  background: #0ea5e9;
+}
+
+/* Admin Panel Layout */
+.admin-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+/* Loading state */
+.admin-loading {
+  text-align: center;
+  padding: 20px;
+  color: #94a3b8;
+}
