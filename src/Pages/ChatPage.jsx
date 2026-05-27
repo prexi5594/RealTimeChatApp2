@@ -17,6 +17,7 @@ import {
 import { createChatRoom } from '../api/ChatApi';
 import { deleteChatRoom } from '../api/ChatApi';
 import { deleteMessage } from '../api/ChatApi';
+import { toast } from 'react-toastify';
 
 function ChatRooms() {
 
@@ -51,7 +52,7 @@ function ChatRooms() {
 
 
   const DEFAULT_ROOM = {
-  id: 0,
+  id: 1,
   name: "General",
   topic: "Welcome",
   icon: "🏠",
@@ -63,7 +64,7 @@ function ChatRooms() {
     
      
     {
-      id: 1,
+      id: 2,
       name: 'Sports',
       topic: 'Sports & Athletics',
       icon: '⚽',
@@ -73,7 +74,7 @@ function ChatRooms() {
     },
 
     {
-      id: 2,
+      id: 3,
       name: 'Politics',
       topic: 'Politics & Government',
       icon: '🏛️',
@@ -83,7 +84,7 @@ function ChatRooms() {
     },
 
     {
-      id: 3,
+      id: 4,
       name: 'Fashion',
       topic: 'Fashion & Style',
       icon: '👗',
@@ -118,7 +119,7 @@ function ChatRooms() {
 
     try {
 
-      const data = await fetchMessages(selectedChatRoom.name.toLowerCase());
+      const data = await fetchMessages(selectedChatRoom.id);
 
       setMessages(Array.isArray(data) ? data : data.messages || []);
     } catch (error) {
@@ -144,7 +145,7 @@ function ChatRooms() {
 
       await sendMessage({
   username,
-  room: selectedChatRoom.name.toLowerCase(),
+  roomId: selectedChatRoom.id,
   message: messageInput,
       });
 
@@ -221,64 +222,67 @@ function ChatRooms() {
     setSelectedRoom(updatedRooms[0]);
   }
 };
-  //CREATE ROOM HANDLER
+  // ROOM HANDLER
   
-  const handleCreateRoom = async () => {
-
+const handleCreateRoom = async () => {
   if (!newRoomName.trim()) {
-    alert("Room name is required");
+    toast.error("Room name is required");
     return;
   }
 
-  const newRoom = {
-    id: Date.now(),
-    name: newRoomName,
-    topic: newRoomTopic,
-    description: newRoomDescription,
-    icon: "💬",
-    members: 1,
-  };
+  const loadingToast = toast.loading("Creating your chat room...");
 
-  setCustomRooms([
-    ...customRooms,
-    newRoom
-  ]);
+  try {
+    // 1. Send the new room to your Flask API
+    const res = await fetch("http://127.0.0.1:5000/rooms", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: newRoomName,
+        topic: newRoomTopic || "General Discussion",
+        description: newRoomDescription || "A custom created chatroom."
+      }),
+    });
 
-  setJoinedRooms([
-    ...joinedRooms,
-    newRoom.id
-  ]);
+    const data = await res.json();
+    toast.dismiss(loadingToast);
 
-  setSelectedRoom(newRoom.id);
+    if (!res.ok) {
+      toast.error(data.error || "Failed to create room");
+      return;
+    }
 
-  setShowModal(false);
+    // 2. Builds the structural room object using the ID from the DATABASE backend!
+    const backendRoom = {
+      id: data.room.id, 
+      name: data.room.name,
+      topic: newRoomTopic || "General Discussion",
+      description: newRoomDescription || "A custom created chatroom.",
+      icon: "💬",
+      members: 1,
+    };
 
-  setNewRoomName('');
-  setNewRoomTopic('');
-  setNewRoomDescription('');
+    // 3. Update your React local states cleanly
+    setCustomRooms([...customRooms, backendRoom]);
+    setJoinedRooms([...joinedRooms, backendRoom.id]);
+    
+    // 4. Clear form input fields
+    setNewRoomName("");
+    setNewRoomTopic("");
+    setNewRoomDescription("");
+    setShowModal(false);
+    
+    toast.success(`Welcome to #${backendRoom.name.toLowerCase()}!`);
+
+  } catch (error) {
+    toast.dismiss(loadingToast);
+    console.error("Error creating room:", error);
+    toast.error("Could not connect to server to create room.");
+  }
 };
 
-const handleDeleteRoom = (roomId) => {
-
-  // remove room from custom rooms
-  const updatedRooms =
-    customRooms.filter(
-      room => room.id !== roomId
-    );
-
-  setCustomRooms(updatedRooms);
-
-  // remove joined state
-  const updatedJoined =
-    joinedRooms.filter(
-      id => id !== roomId
-    );
-
-  setJoinedRooms(updatedJoined);
-
-  // switch to first room
-  setSelectedRoom(1);
-};
 
 const handleDeleteMessage = async (messageId) => {
   try {
@@ -321,6 +325,71 @@ const handleDeleteMessage = async (messageId) => {
 };
 
 
+const handleDeleteRoom = (roomId) => {
+  if (!roomId) return;
+
+  // Create a custom confirmation toast with action buttons
+  toast.info(
+    <div>
+      <p className="font-semibold mb-2 text-gray-800">Delete this room permanently?</p>
+      <div className="flex gap-2 justify-end">
+        <button 
+          className="bg-gray-200 text-gray-800 px-2 py-1 text-xs rounded font-medium hover:bg-gray-300 transition"
+          onClick={() => toast.dismiss()}
+        >
+          Cancel
+        </button>
+        <button 
+          className="bg-red-600 text-white px-2 py-1 text-xs rounded font-medium hover:bg-red-700 transition"
+          onClick={async () => {
+            toast.dismiss(); // Close confirmation
+            await proceedWithDelete(roomId); // Run actual deletion
+          }}
+        >
+          Confirm
+        </button>
+      </div>
+    </div>,
+    {
+      position: "top-center",
+      autoClose: false, // Don't close automatically
+      closeOnClick: false,
+      draggable: false
+    }
+  );
+};
+
+// Helper function that actually talks to your Flask backend
+const proceedWithDelete = async (roomId) => {
+  const loadingToast = toast.loading("Deleting room from database...");
+  try {
+    const res = await fetch(`http://127.0.0.1:5000/rooms/${roomId}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" }
+    });
+
+    const data = await res.json();
+    toast.dismiss(loadingToast);
+
+    if (!res.ok) {
+      toast.error(data.error || "Failed to remove room");
+      return;
+    }
+
+
+    setCustomRooms(customRooms.filter((room) => room.id != roomId));
+    setJoinedRooms(joinedRooms.filter((id) => id != roomId));
+    if (selectedRoom?.id == roomId) {
+      setSelectedRoom(allRooms.find(r => r.id == 1) || null);
+    }
+
+    toast.success("Room deleted!");
+  } catch (error) {
+    toast.dismiss(loadingToast);
+    console.error(error);
+    toast.error("Network error during deletion");
+  }
+};
 const handleLongPress = (msgId) => {
   setSelectedMessageID(msgId);
   setShowMessageMenu(true);
@@ -557,7 +626,7 @@ useEffect(() => {
     </button>
 
     {/* Dropdown */}
-    {showRoomMenu && (
+    {showRoomMenu && selectedChatRoom?.id !== 1 && (
       <div
         className="absolute right-0 mt-2 w-40 bg-white border rounded-lg shadow-lg z-50"
         onClick={(e) => e.stopPropagation()}

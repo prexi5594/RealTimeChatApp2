@@ -11,7 +11,7 @@ export default function ChatBox({ room }) {
     if (!room) return;
 
     try {
-      const data = await fetchMessages(room);
+      const data = await fetchMessages(room.id);
       setMessages(Array.isArray(data) ? data : data.messages || []);
     } catch (err) {
       console.log("Error loading messages:", err);
@@ -23,7 +23,7 @@ export default function ChatBox({ room }) {
 
     try {
       await sendMessage({
-        room,
+        roomId: room.id,
         username,
         message: text, 
       });

@@ -1,27 +1,31 @@
-// Change this line to use localhost (127.0.0.1)
-const BASE_URL = "http://127.0.0"; 
-
+const BASE_URL = "http://127.0.0.1:5000"; 
 const getToken = () => localStorage.getItem("token");
 
-export const apiRequest = async (endpoint, method = "GET") => {
-  const cleanEndpoint = endpoint.startsWith("/") ? endpoint.slice(1) : endpoint;
+export const apiRequest = async (endpoint, method = "GET", body = null) => {
+  const cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
   
   try {
-    const res = await fetch(`${BASE_URL}${cleanEndpoint}`, {
+    const options = {
       method,
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${getToken()}`
+        // 🟢 ADDED "Bearer " BACK: This satisfies your backend's .split(" ")[1] logic
+        "Authorization": getToken() ? `Bearer ${getToken()}` : ""
       }
-    });
+    };
+
+    if (body) {
+      options.body = JSON.stringify(body);
+    }
+
+    const res = await fetch(`${BASE_URL}${cleanEndpoint}`, options);
 
     if (!res.ok) {
-      throw new Error(`Server returned status: ${res.status}`);
+      throw new Error(`Server returned status code: ${res.status}`);
     }
 
     return await res.json();
   } catch (error) {
-    alert("Cannot connect to backend");
     console.error("Connection error details:", error);
     throw error;
   }

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -8,54 +9,68 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!email.trim() || !password.trim()) {
-      alert("Please fill in all fields");
-      return;
-    }
+  if (!email.trim() || !password.trim()) {
+    toast.error("Please fill in all fields");
+    return;
+  }
 
-    setIsLoading(true);
+  setIsLoading(true);
+  // Track the ID of our loading container
+  const loadingToastId = toast.loading("Logging in...");
 
-    try {
-      // Changed to clear domain mapping: No ending numbers or trailing zeros
-      const res = await fetch("http://localhost:5000/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
+  try {
+    const res = await fetch("http://127.0.0.1:5000/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    });
 
-      const data = await res.json();
-      console.log("LOGIN RESPONSE:", data);
+    const data = await res.json();
 
-      if (!res.ok) {
-        alert(data.error || "Login failed");
+    if (!res.ok) {
+      // Clear the loading spinner right away since we hit an error wall
+      toast.dismiss(loadingToastId);
+
+      if (res.status === 403 && data.needs_verification) {
+        toast.error("Please verify your email first");
+        navigate("/signup");
         return;
       }
 
-      /* SAVE USER METADATA */
-      localStorage.setItem("token", data.token || "mock-jwt-token");
-      localStorage.setItem("user", JSON.stringify(data.user));
-      localStorage.setItem( "username",data.user.username || username);
-      localStorage.setItem("email", data.user?.email || email);
-
-      alert("Login successful");
-
-      if (data.user?.role === "admin") {
-        navigate("/admin");
-      } else {
-        navigate("/chat");
-      }
-
-    } catch (error) {
-      console.error("Connection error details:", error);
-      alert("Cannot connect to backend");
-    } finally {
-      setIsLoading(false);
+      toast.error(data.error || "Login failed");
+      return;
     }
-  };
+
+    /* 1. SAVE USER METADATA FIRST (Crucial order fix) */
+    localStorage.setItem("token", data.token || "mock-jwt-token");
+    localStorage.setItem("user", JSON.stringify(data.user));
+    localStorage.setItem("username", data.user?.username || username);
+    localStorage.setItem("email", data.user?.email || email);
+
+    /* 2. KILL SPINNER AND SHOW SUCCESS TOAST */
+    toast.dismiss(loadingToastId);
+    toast.success("Login successful!");
+
+    /* 3. THEN NAVIGATE */
+    if (data.user?.role === "admin") {
+      navigate("/admin");
+    } else {
+      navigate("/chat");
+    }
+
+  } catch (error) {
+    // Kill spinner if the backend server is offline or drops connection
+    toast.dismiss(loadingToastId);
+    console.error("Connection error details:", error);
+    toast.error("Cannot connect to backend");
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-white flex flex-col">

@@ -1,10 +1,42 @@
 
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = "http://127.0.0.1:5000";
 
-export async function fetchMessages(room) {
+// REGISTER
+export async function registerUser(data) {
+  const res = await fetch(`${BASE_URL}/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
+
+  const result = await res.json();
+
+  if (!res.ok) throw new Error(result.error || "Register failed");
+
+  return result;
+}
+
+// VERIFY OTP
+export async function verifyOtp(data) {
+  const res = await fetch(`${BASE_URL}/verify-otp`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
+
+  const result = await res.json();
+
+  if (!res.ok) throw new Error(result.error || "OTP verification failed");
+
+  return result;
+}
+
+
+
+export async function fetchMessages(roomId) {
   try {
     const response = await fetch(
-      `${BASE_URL}/messages/${room}`
+      `${BASE_URL}/messages/${roomId}`
     );
 
     if (!response.ok) {
@@ -34,7 +66,7 @@ export async function sendMessage(data) {
         body: JSON.stringify({
           message: data.message,
           username: data.username,
-          room: data.room
+          room_id: data.roomId
         })
       }
     );
@@ -62,7 +94,7 @@ export async function sendMessage(data) {
 export async function createChatRoom(roomData) {
   try {
     const response = await fetch(
-      "http://172.28.42.45:5000/rooms",
+      "http://127.0.0.1:5000/rooms",
       {
         method: "POST",
         headers: {
@@ -89,7 +121,7 @@ export async function createChatRoom(roomData) {
 export async function deleteChatRoom(roomId) {
   try {
     const response = await fetch(
-      `http://172.28.42.45:5000/rooms/${roomId}`,
+      `http://127.0.0.1:5000/rooms/${roomId}`,
       {
         method: "DELETE"
       }
@@ -112,7 +144,7 @@ export async function deleteChatRoom(roomId) {
 export async function fetchChatRooms() {
   try {
     const response = await fetch(
-      "http://172.28.42.45:5000/rooms"
+      "http://127.0.0.1:5000/rooms"
     );
 
     if (!response.ok) {
@@ -133,7 +165,7 @@ export async function fetchChatRooms() {
 export async function fetchChatRoomDetails(roomId) {
   try {
     const response = await fetch(
-      `http://172.28.42.45:5000/rooms/${roomId}`
+      `http://127.0.0.1:5000/rooms/${roomId}`
     );
 
     if (!response.ok) {
