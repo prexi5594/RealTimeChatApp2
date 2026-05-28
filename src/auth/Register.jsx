@@ -87,14 +87,12 @@ const handleRegister = async (e) => {
   // VERIFY OTP
   // =========================
   const handleVerifyOtp = async (e) => {
-  e.preventDefault();
-  localStorage.setItem("token", data.token);
-navigate("/chat");
+    e.preventDefault();
 
-  if (!otp) {
-    toast.error("Enter OTP code");
-    return;
-  }
+    if (!otp) {
+      toast.error("Enter OTP code");
+      return;
+    }
 
   setLoading(true);
 

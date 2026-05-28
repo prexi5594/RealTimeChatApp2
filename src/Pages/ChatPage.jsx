@@ -250,6 +250,11 @@ const handleCreateRoom = async () => {
     toast.dismiss(loadingToast);
 
     if (!res.ok) {
+      if (data.action === "login") {
+        window.location.pathname = "/login";
+        return;
+      }
+
       toast.error(data.error || "Failed to create room");
       return;
     }
@@ -372,6 +377,11 @@ const proceedWithDelete = async (roomId) => {
     toast.dismiss(loadingToast);
 
     if (!res.ok) {
+      if (data.action === "login") {
+        window.location.pathname = "/login";
+        return;
+      }
+
       toast.error(data.error || "Failed to remove room");
       return;
     }
