@@ -52,7 +52,13 @@ const handleRegister = async (e) => {
       }
     );
 
-    const data = await res.json();
+    let data = null;
+    let text = null;
+    try {
+      data = await res.json();
+    } catch {
+      text = await res.text().catch(() => null);
+    }
 
     // USER ALREADY EXISTS
     if (res.status === 409) {
@@ -81,7 +87,8 @@ const handleRegister = async (e) => {
 
     // OTHER ERRORS
     if (!res.ok) {
-      toast.error(data.error || "Registration failed");
+      const message = data?.error || text || `Signup failed (${res.status})`;
+      toast.error(message);
       return;
     }
 
@@ -125,18 +132,18 @@ const handleRegister = async (e) => {
       }
     );
 
-    // HANDLE NON-JSON SERVER ERRORS
-    let data;
+    let data = null;
+    let text = null;
 
     try {
       data = await res.json();
     } catch {
-      throw new Error("Server returned invalid response");
+      text = await res.text().catch(() => null);
     }
 
-    // INVALID OTP / OTHER ERRORS
     if (!res.ok) {
-      toast.error(data.error || "Invalid OTP");
+      const message = data?.error || text || "Invalid OTP";
+      toast.error(message);
       return;
     }
 
