@@ -1,6 +1,6 @@
 import API from "../services/api";
 
-const BASE_URL = "http://127.0.0.1:5000/admin";
+const BASE_URL = "https://realtimechatappbackend-y8z2.onrender.com/admin";
 
 
 export const getAllUsers = () => {

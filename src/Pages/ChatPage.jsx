@@ -234,7 +234,7 @@ const handleCreateRoom = async () => {
 
   try {
     // 1. Send the new room to your Flask API
-    const res = await fetch("http://127.0.0.1:5000/rooms", {
+    const res = await fetch("https://realtimechatappbackend-y8z2.onrender.com/rooms", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -363,7 +363,7 @@ const handleDeleteRoom = (roomId) => {
 const proceedWithDelete = async (roomId) => {
   const loadingToast = toast.loading("Deleting room from database...");
   try {
-    const res = await fetch(`http://127.0.0.1:5000/rooms/${roomId}`, {
+    const res = await fetch(`https://realtimechatappbackend-y8z2.onrender.com/rooms/${roomId}`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" }
     });

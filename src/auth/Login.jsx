@@ -21,7 +21,7 @@ export default function Login() {
   const loadingToastId = toast.loading("Logging in...");
 
   try {
-    const res = await fetch("http://127.0.0.1:5000/login", {
+    const res = await fetch("https://realtimechatappbackend-y8z2.onrender.com/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

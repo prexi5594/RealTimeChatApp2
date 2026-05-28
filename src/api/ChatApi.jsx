@@ -1,5 +1,5 @@
 
-const BASE_URL = "http://127.0.0.1:5000";
+const BASE_URL = "https://realtimechatappbackend-y8z2.onrender.com";
 
 // REGISTER
 export async function registerUser(data) {
@@ -94,7 +94,7 @@ export async function sendMessage(data) {
 export async function createChatRoom(roomData) {
   try {
     const response = await fetch(
-      `${BASE_URL}/rooms`,
+      `${BASE_URL}/rooms/`,
       {
         method: "POST",
         headers: {
