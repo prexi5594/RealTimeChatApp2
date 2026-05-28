@@ -8,17 +8,9 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = async (e) => {
+const handleLogin = async (e) => {
   e.preventDefault();
-
-  if (!email.trim() || !password.trim()) {
-    toast.error("Please fill in all fields");
-    return;
-  }
-
-  setIsLoading(true);
-  // Track the ID of our loading container
-  const loadingToastId = toast.loading("Logging in...");
+  setLoading(true);
 
   try {
     const res = await fetch("https://realtimechatappbackend-y8z2.onrender.com/login", {
@@ -26,24 +18,43 @@ export default function Login() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({
+        email,
+        password,
+      }),
     });
 
     const data = await res.json();
 
+    // ❌ backend error cases
     if (!res.ok) {
-      // Clear the loading spinner right away since we hit an error wall
-      toast.dismiss(loadingToastId);
-
-      if (res.status === 403 && data.needs_verification) {
-        toast.error("Please verify your email first");
-        navigate("/signup");
+      // email not verified
+      if (res.status === 403) {
+        toast.error(data.error || "Please verify your email first");
         return;
       }
 
+      // wrong password / not found / etc.
       toast.error(data.error || "Login failed");
       return;
     }
+
+    // ✅ success
+    toast.success("Login successful");
+
+    // save token
+    localStorage.setItem("token", data.token);
+
+    // redirect to chat
+    navigate("/chat");
+
+  } catch (error) {
+    console.error("Login error:", error);
+    toast.error("Server error. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
 
     /* 1. SAVE USER METADATA FIRST (Crucial order fix) */
     localStorage.setItem("token", data.token);
