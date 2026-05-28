@@ -1,32 +1,32 @@
 import API from "../services/api";
 
-const BASE = "/admin";
+const BASE_URL = "http://127.0.0.1:5000/admin";
 
 
 export const getAllUsers = () => {
-  return API.get(`${BASE}/users`);
+  return API.get(`${BASE_URL}/users`);
 };
 
 // BAN USER
 export const banUser = (userId) => {
-  return API.post(`${BASE}/ban/${userId}`);
+  return API.post(`${BASE_URL}/ban/${userId}`);
 };
 
 // UNBAN USER
 export const unbanUser = (userId) => {
-  return API.post(`${BASE}/unban/${userId}`);
+  return API.post(`${BASE_URL}/unban/${userId}`);
 };
 
 
 
 // GET ALL MESSAGES
 export const getAllMessages = () => {
-  return API.get(`${BASE}/messages`);
+  return API.get(`${BASE_URL}/messages`);
 };
 
 // DELETE MESSAGE
 export const deleteMessage = (messageId) => {
-  return API.delete(`${BASE}/messages/${messageId}`);
+  return API.delete(`${BASE_URL}/messages/${messageId}`);
 };
 
 
@@ -34,17 +34,17 @@ export const deleteMessage = (messageId) => {
 
 // GET ALL ROOMS
 export const getAllRooms = () => {
-  return API.get(`${BASE}/rooms`);
+  return API.get(`${BASE_URL}/rooms`);
 };
 
 // DELETE ROOM
 export const deleteRoom = (roomId) => {
-  return API.delete(`${BASE}/rooms/${roomId}`);
+  return API.delete(`${BASE_URL}/rooms/${roomId}`);
 };
 
 
 
 // GET CHAT REPORTS (abuse reports, flagged messages, etc.)
 export const getReports = () => {
-  return API.get(`${BASE}/reports`);
+  return API.get(`${BASE_URL}/reports`);
 };

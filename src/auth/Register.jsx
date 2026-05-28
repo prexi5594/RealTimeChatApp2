@@ -37,7 +37,7 @@ export default function SignUp() {
     setLoading(true);
 
     try {
-      const res = await fetch("https://realtimechatappbackend-lkza.onrender.com/register", {
+      const res = await fetch("http://127.0.0.1:5000/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -74,7 +74,7 @@ export default function SignUp() {
     setLoading(true);
 
     try {
-      const res = await fetch("https://realtimechatappbackend-lkza.onrender.com/verify-otp", {
+      const res = await fetch("http://127.0.0.1:5000/verify-otp", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -107,7 +107,7 @@ export default function SignUp() {
   // =========================
   const handleResendOtp = async () => {
     try {
-      const res = await fetch("https://realtimechatappbackend-lkza.onrender.com/resend-otp", {
+      const res = await fetch("http://127.0.0.1:5000/resend-otp", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
