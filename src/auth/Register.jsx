@@ -56,12 +56,26 @@ const handleRegister = async (e) => {
 
     // USER ALREADY EXISTS
     if (res.status === 409) {
-      toast.error("Account already exists. Redirecting to login...");
+      const resendResponse = await fetch(
+        "https://realtimechatappbackend-y8z2.onrender.com/resend-otp",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email }),
+        }
+      );
 
-      setTimeout(() => {
-        navigate("/login");
-      }, 1500);
+      const resendData = await resendResponse.json().catch(() => ({}));
 
+      if (!resendResponse.ok) {
+        toast.error(resendData.error || "Account exists, but we could not resend OTP.");
+        return;
+      }
+
+      toast.success("Existing account found. OTP resent to your email.");
+      setStep("otp");
       return;
     }
 
@@ -128,6 +142,22 @@ const handleRegister = async (e) => {
 
     // SUCCESS
     toast.success("Account verified successfully!");
+
+    if (data.token) {
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user || {}));
+      localStorage.setItem("username", data.user?.username || "");
+      localStorage.setItem("email", data.user?.email || email);
+
+      setTimeout(() => {
+        if (data.user?.role === "admin") {
+          navigate("/admin");
+        } else {
+          navigate("/chat");
+        }
+      }, 1500);
+      return;
+    }
 
     setTimeout(() => {
       navigate("/login");
