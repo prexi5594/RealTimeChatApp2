@@ -21,23 +21,25 @@ export default function SignUp() {
   // =========================
   // REGISTER USER
   // =========================
-  const handleRegister = async (e) => {
-    e.preventDefault();
+const handleRegister = async (e) => {
+  e.preventDefault();
 
-    if (!email || !username || !password) {
-      toast.error("Please fill in all fields");
-      return;
-    }
+  if (!email || !username || !password) {
+    toast.error("Please fill in all fields");
+    return;
+  }
 
-    if (!validateEmail(email)) {
-      toast.error("Enter a valid email address");
-      return;
-    }
+  if (!validateEmail(email)) {
+    toast.error("Enter a valid email address");
+    return;
+  }
 
-    setLoading(true);
+  setLoading(true);
 
-    try {
-      const res = await fetch("https://realtimechatappbackend-y8z2.onrender.com/register", {
+  try {
+    const res = await fetch(
+      "https://realtimechatappbackend-y8z2.onrender.com/register",
+      {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -47,34 +49,59 @@ export default function SignUp() {
           username,
           password,
         }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        toast.error(data.error || "Registration failed");
-        return;
       }
+    );
 
-      toast.success("OTP sent to email");
-      setStep("otp");
-    } catch (error) {
-      console.error(error);
-      toast.error("Server error");
-    } finally {
-      setLoading(false);
+    const data = await res.json();
+
+    // USER ALREADY EXISTS
+    if (res.status === 409) {
+      toast.error("Account already exists. Redirecting to login...");
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
+
+      return;
     }
-  };
+
+    // OTHER ERRORS
+    if (!res.ok) {
+      toast.error(data.error || "Registration failed");
+      return;
+    }
+
+    // SUCCESS
+    toast.success("OTP sent to email");
+    setStep("otp");
+
+  } catch (error) {
+    console.error(error);
+    toast.error("Server error");
+  } finally {
+    setLoading(false);
+  }
+};
 
   // =========================
   // VERIFY OTP
   // =========================
   const handleVerifyOtp = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  e.preventDefault();
+  localStorage.setItem("token", data.token);
+navigate("/chat");
 
-    try {
-      const res = await fetch("https://realtimechatappbackend-y8z2.onrender.com/verify-otp", {
+  if (!otp) {
+    toast.error("Enter OTP code");
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const res = await fetch(
+      "https://realtimechatappbackend-y8z2.onrender.com/verify-otp",
+      {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -83,58 +110,97 @@ export default function SignUp() {
           email,
           code: otp,
         }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        toast.error(data.error || "Invalid OTP");
-        return;
       }
+    );
 
-      toast.success("Account verified!");
-      navigate("/login");
-    } catch (err) {
-      console.error(err);
-      toast.error("Server error");
-    } finally {
-      setLoading(false);
+    // HANDLE NON-JSON SERVER ERRORS
+    let data;
+
+    try {
+      data = await res.json();
+    } catch {
+      throw new Error("Server returned invalid response");
     }
-  };
+
+    // INVALID OTP / OTHER ERRORS
+    if (!res.ok) {
+      toast.error(data.error || "Invalid OTP");
+      return;
+    }
+
+    // SUCCESS
+    toast.success("Account verified successfully!");
+
+    setTimeout(() => {
+      navigate("/login");
+    }, 1500);
+
+  } catch (err) {
+    console.error(err);
+
+    toast.error(
+      err.message || "Server error"
+    );
+
+  } finally {
+    setLoading(false);
+  }
+};
 
   // =========================
   // RESEND OTP
   // =========================
   const handleResendOtp = async () => {
-    try {
-      const res = await fetch("https://realtimechatappbackend-y8z2.onrender.com/resend-otp", {
+
+  if (!email) {
+    toast.error("Email is required");
+    return;
+  }
+
+  try {
+
+    const res = await fetch(
+      "https://realtimechatappbackend-y8z2.onrender.com/resend-otp",
+      {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email }),
-      });
-
-      let data = {};
-
-try {
-  data = await res.json();
-} catch (e) {
-  data = { error: "Invalid server response" };
-}
-
-      if (!res.ok) {
-        toast.error(data.error || "Failed to resend OTP");
-        return;
       }
+    );
 
-      toast.success("OTP resent successfully!");
-    } catch (error) {
-  console.error("FETCH FAILED:", error);
-  toast.error("Backend not reachable (CORS or server issue)");
-}
-  };
+    let data = {};
 
+    try {
+      data = await res.json();
+    } catch (e) {
+      data = {
+        error: "Invalid server response"
+      };
+    }
+
+    if (!res.ok) {
+      toast.error(
+        data.error || "Failed to resend OTP"
+      );
+      return;
+    }
+
+    toast.success("OTP resent successfully!");
+
+  } catch (error) {
+
+    console.error(
+      "FETCH FAILED:",
+      error
+    );
+
+    toast.error(
+      "Backend not reachable (CORS or server issue)"
+    );
+  }
+};
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* HEADER */}

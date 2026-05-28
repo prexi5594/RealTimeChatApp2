@@ -50,7 +50,10 @@ export default function Login() {
     localStorage.setItem("user", JSON.stringify(data.user));
     localStorage.setItem("username", data.user?.username);
     localStorage.setItem("email", data.user?.email);
-    /* 2. KILL SPINNER AND SHOW SUCCESS TOAST */
+
+
+
+  
     toast.dismiss(loadingToastId);
     toast.success("Login successful!");
 
