@@ -1,4 +1,4 @@
-const BASE_URL = "http://127.0.0.1:5000"; 
+const BASE_URL = "https://realtimechatappbackend-y8z2.onrender.com"; 
 const getToken = () => localStorage.getItem("token");
 
 export const apiRequest = async (endpoint, method = "GET", body = null) => {
@@ -9,7 +9,7 @@ export const apiRequest = async (endpoint, method = "GET", body = null) => {
       method,
       headers: {
         "Content-Type": "application/json",
-        // 🟢 ADDED "Bearer " BACK: This satisfies your backend's .split(" ")[1] logic
+        
         "Authorization": getToken() ? `Bearer ${getToken()}` : ""
       }
     };
