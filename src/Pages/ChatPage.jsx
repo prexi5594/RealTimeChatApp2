@@ -234,7 +234,7 @@ const handleCreateRoom = async () => {
 
   try {
     // 1. Send the new room to your Flask API
-    const res = await fetch("http://127.0.0.1:5000/rooms", {
+    const res = await fetch("https://realtimechatappbackend-lkza.onrender.com/rooms", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

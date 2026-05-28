@@ -37,7 +37,7 @@ export default function SignUp() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://127.0.0.1:5000/register", {
+      const res = await fetch("https://realtimechatappbackend-lkza.onrender.com/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -74,7 +74,7 @@ export default function SignUp() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://127.0.0.1:5000/verify-otp", {
+      const res = await fetch("https://realtimechatappbackend-lkza.onrender.com/verify-otp", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -107,7 +107,7 @@ export default function SignUp() {
   // =========================
   const handleResendOtp = async () => {
     try {
-      const res = await fetch("http://127.0.0.1:5000/resend-otp", {
+      const res = await fetch("https://realtimechatappbackend-lkza.onrender.com/resend-otp", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -115,7 +115,13 @@ export default function SignUp() {
         body: JSON.stringify({ email }),
       });
 
-      const data = await res.json();
+      let data = {};
+
+try {
+  data = await res.json();
+} catch (e) {
+  data = { error: "Invalid server response" };
+}
 
       if (!res.ok) {
         toast.error(data.error || "Failed to resend OTP");
@@ -124,9 +130,9 @@ export default function SignUp() {
 
       toast.success("OTP resent successfully!");
     } catch (error) {
-      console.error(error);
-      toast.error("Server error while resending OTP");
-    }
+  console.error("FETCH FAILED:", error);
+  toast.error("Backend not reachable (CORS or server issue)");
+}
   };
 
   return (

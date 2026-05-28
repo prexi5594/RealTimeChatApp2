@@ -21,7 +21,7 @@ export default function Login() {
   const loadingToastId = toast.loading("Logging in...");
 
   try {
-    const res = await fetch("http://127.0.0.1:5000/login", {
+    const res = await fetch("https://realtimechatappbackend-lkza.onrender.com/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -46,11 +46,10 @@ export default function Login() {
     }
 
     /* 1. SAVE USER METADATA FIRST (Crucial order fix) */
-    localStorage.setItem("token", data.token || "mock-jwt-token");
+    localStorage.setItem("token", data.token);
     localStorage.setItem("user", JSON.stringify(data.user));
-    localStorage.setItem("username", data.user?.username || username);
-    localStorage.setItem("email", data.user?.email || email);
-
+    localStorage.setItem("username", data.user?.username);
+    localStorage.setItem("email", data.user?.email);
     /* 2. KILL SPINNER AND SHOW SUCCESS TOAST */
     toast.dismiss(loadingToastId);
     toast.success("Login successful!");

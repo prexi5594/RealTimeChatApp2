@@ -1,5 +1,5 @@
 
-const BASE_URL = "http://127.0.0.1:5000";
+const BASE_URL = "https://realtimechatappbackend-lkza.onrender.com";
 
 // REGISTER
 export async function registerUser(data) {
@@ -94,7 +94,7 @@ export async function sendMessage(data) {
 export async function createChatRoom(roomData) {
   try {
     const response = await fetch(
-      "http://127.0.0.1:5000/rooms",
+      `${BASE_URL}/rooms`,
       {
         method: "POST",
         headers: {
@@ -121,7 +121,7 @@ export async function createChatRoom(roomData) {
 export async function deleteChatRoom(roomId) {
   try {
     const response = await fetch(
-      `http://127.0.0.1:5000/rooms/${roomId}`,
+      `${BASE_URL}/rooms/${roomId}`,
       {
         method: "DELETE"
       }
@@ -165,7 +165,7 @@ export async function fetchChatRooms() {
 export async function fetchChatRoomDetails(roomId) {
   try {
     const response = await fetch(
-      `http://127.0.0.1:5000/rooms/${roomId}`
+      `${BASE_URL}/rooms/${roomId}`
     );
 
     if (!response.ok) {

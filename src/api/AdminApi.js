@@ -2,11 +2,7 @@ import API from "../services/api";
 
 const BASE = "/admin";
 
-/* ======================
-   USERS
-====================== */
 
-// GET ALL USERS
 export const getAllUsers = () => {
   return API.get(`${BASE}/users`);
 };
@@ -22,9 +18,6 @@ export const unbanUser = (userId) => {
 };
 
 
-/* ======================
-   MESSAGES
-====================== */
 
 // GET ALL MESSAGES
 export const getAllMessages = () => {
@@ -37,9 +30,7 @@ export const deleteMessage = (messageId) => {
 };
 
 
-/* ======================
-   ROOMS
-====================== */
+
 
 // GET ALL ROOMS
 export const getAllRooms = () => {
@@ -52,9 +43,6 @@ export const deleteRoom = (roomId) => {
 };
 
 
-/* ======================
-   REPORTS / MODERATION
-====================== */
 
 // GET CHAT REPORTS (abuse reports, flagged messages, etc.)
 export const getReports = () => {
