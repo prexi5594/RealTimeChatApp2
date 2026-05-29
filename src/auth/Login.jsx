@@ -82,7 +82,7 @@ const handleLogin = async (e) => {
           <span className="font-bold text-xl">Quickchat</span>
           <div className="flex gap-4">
             <Link to="/login" className="bg-white text-[#0052CC] px-5 py-2 rounded">Login</Link>
-            <Link to="/signup" className="bg-white text-[#0052CC] px-5 py-2 rounded">Sign Up</Link>
+            <Link to="/register" className="bg-white text-[#0052CC] px-5 py-2 rounded">Sign Up</Link>
           </div>
         </div>
       </header>

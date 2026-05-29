@@ -20,7 +20,7 @@ function Home() {
               Login
             </Link>
             <Link 
-              to="/signup" 
+              to="/register" 
               className="px-6 py-2 bg-white text-[#0052CC] rounded font-semibold hover:bg-gray-100 transition"
             >
               Sign Up
@@ -42,7 +42,7 @@ function Home() {
               Get Started
             </Link>
             <Link 
-              to="/signup" 
+              to="/register" 
               className="px-8 py-3 bg-transparent border-2 border-white text-white rounded-lg font-semibold hover:bg-white hover:text-[#0052CC] transition inline-block"
             >
               Learn More
@@ -87,7 +87,7 @@ function Home() {
           <h2 className="text-4xl font-bold mb-6">Ready to chat?</h2>
           <p className="text-lg mb-8">Join thousands of users who trust Quickchat for their messaging needs</p>
           <Link 
-            to="/signup" 
+            to="/register" 
             className="px-8 py-3 bg-white text-[#0052CC] rounded-lg font-semibold hover:bg-gray-100 transition inline-block"
           >
             Sign Up Now

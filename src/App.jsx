@@ -15,7 +15,7 @@ function App() {
         {/* Public Routes */}
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Register />} />
+        <Route path="/register" element={<Register />} />
 
         {/* Chat */}
         <Route path="/chat" element={<ChatRooms />} />
