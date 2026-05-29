@@ -1,15 +1,16 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 
 
 export default function SignUp() {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const [step, setStep] = useState("register");
+  const [step, setStep] = useState(location.state?.step || "register");
 
-  const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState(location.state?.email || "");
+  const [username, setUsername] = useState(location.state?.username || "");
   const [password, setPassword] = useState("");
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
@@ -17,6 +18,12 @@ export default function SignUp() {
   const validateEmail = (email) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   };
+
+  useEffect(() => {
+    if (location.state?.toastMessage) {
+      toast.info(location.state.toastMessage);
+    }
+  }, [location.state]);
 
   // =========================
   // REGISTER USER
