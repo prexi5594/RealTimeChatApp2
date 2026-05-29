@@ -69,51 +69,6 @@ const handleRegister = async (e) => {
   }
 };
 
-
-  // =========================
-  // VERIFY OTP
-  // =========================
-const handleRegister = async (e) => {
-  e.preventDefault();
-
-  if (!email || !username || !password) {
-    toast.error("All fields required");
-    return;
-  }
-
-  setLoading(true);
-
-  try {
-    const res = await fetch(
-      "https://realtimechatappbackend-y8z2.onrender.com/register",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, username, password }),
-      }
-    );
-
-    const data = await res.json().catch(() => ({}));
-
-    if (!res.ok) {
-      toast.error(data.error || "Registration failed");
-      return;
-    }
-
-    toast.success(data.message || "OTP sent to email");
-
-    // go to OTP screen
-    setStep("otp");
-    setOtpEmail(email);
-
-  } catch (err) {
-    console.error(err);
-    toast.error("Server error");
-  } finally {
-    setLoading(false);
-  }
-};
-
   // =========================
   // RESEND OTP
   // =========================
