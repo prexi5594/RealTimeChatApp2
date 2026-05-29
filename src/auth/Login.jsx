@@ -8,20 +8,20 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = async (e) => {
+const handleLogin = async (e) => {
   e.preventDefault();
 
-  if (!email.trim() || !password.trim()) {
-    toast.error("Please fill in all fields");
+  if (!email || !password) {
+    toast.error("Fill all fields");
     return;
   }
 
   setIsLoading(true);
-  // Track the ID of our loading container
-  const loadingToastId = toast.loading("Logging in...");
+
+  const toastId = toast.loading("Logging in...");
 
   try {
-    const res = await fetch("https://realtimechatappbackend-lkza.onrender.com/login", {
+    const res = await fetch("https://realtimechatappbackend-y8z2.onrender.com/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -29,82 +29,47 @@ export default function Login() {
       body: JSON.stringify({ email, password }),
     });
 
-    let data = null;
-    try {
-      data = await res.json();
-    } catch {
-      data = null;
-    }
+    const data = await res.json().catch(() => ({}));
 
     if (!res.ok) {
-      // Clear the loading spinner right away since we hit an error wall
-      toast.dismiss(loadingToastId);
+      toast.dismiss(toastId);
 
-      if (res.status === 401) {
-        toast.error(data?.error || "Invalid email or password.");
-        return;
-      }
-
+      // ❌ NOT VERIFIED CASE
       if (res.status === 403) {
-        const resendResponse = await fetch(
-          "https://realtimechatappbackend-lkza.onrender.com/resend-otp",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ email }),
-          }
-        );
+        toast.error(data.error || "Account not verified");
 
-        let resendData = null;
-        try {
-          resendData = await resendResponse.json();
-        } catch {
-          resendData = null;
-        }
-
-        if (!resendResponse.ok) {
-          toast.error(resendData?.error || "Access denied. Verification OTP could not be resent.");
-          return;
-        }
-
-        toast.success(resendData?.message || "Email not verified. OTP resent to your email.");
-        navigate("/signup", {
-          state: {
-            email,
-            step: "otp",
-            toastMessage: "We sent a new OTP to your email so you can verify your account.",
-          },
+        // optional resend OTP
+        await fetch("https://realtimechatappbackend-y8z2.onrender.com/resend-otp", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
         });
+
+        toast.info("OTP resent. Please verify your account.");
         return;
       }
 
-      toast.error(data?.error || `Login failed (${res.status})`);
+      toast.error(data.error || "Login failed");
       return;
     }
 
-    /* 1. SAVE USER METADATA FIRST (Crucial order fix) */
+    // SUCCESS
     localStorage.setItem("token", data.token);
     localStorage.setItem("user", JSON.stringify(data.user));
-    localStorage.setItem("username", data.user?.username);
-    localStorage.setItem("email", data.user?.email);
-    /* 2. KILL SPINNER AND SHOW SUCCESS TOAST */
-    toast.dismiss(loadingToastId);
-    toast.success("Login successful!");
 
-    /* 3. THEN NAVIGATE */
-    if (data.user?.role === "admin") {
+    toast.dismiss(toastId);
+    toast.success("Login successful");
+
+    if (data.user.role === "admin") {
       navigate("/admin");
     } else {
       navigate("/chat");
     }
 
-  } catch (error) {
-    // Kill spinner if the backend server is offline or drops connection
-    toast.dismiss(loadingToastId);
-    console.error("Connection error details:", error);
-    toast.error("Cannot connect to backend");
+  } catch (err) {
+    toast.dismiss(toastId);
+    console.error(err);
+    toast.error("Server unreachable");
   } finally {
     setIsLoading(false);
   }

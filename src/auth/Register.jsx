@@ -32,12 +32,7 @@ const handleRegister = async (e) => {
   e.preventDefault();
 
   if (!email || !username || !password) {
-    toast.error("Please fill in all fields");
-    return;
-  }
-
-  if (!validateEmail(email)) {
-    toast.error("Enter a valid email address");
+    toast.error("All fields required");
     return;
   }
 
@@ -48,142 +43,72 @@ const handleRegister = async (e) => {
       "https://realtimechatappbackend-y8z2.onrender.com/register",
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          username,
-          password,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, username, password }),
       }
     );
 
-    let data = null;
-    let text = null;
-    try {
-      data = await res.json();
-    } catch {
-      text = await res.text().catch(() => null);
-    }
+    const data = await res.json().catch(() => ({}));
 
-    // USER ALREADY EXISTS
-    if (res.status === 409) {
-      const resendResponse = await fetch(
-        "https://realtimechatappbackend-y8z2.onrender.com/resend-otp",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email }),
-        }
-      );
-
-      const resendData = await resendResponse.json().catch(() => ({}));
-
-      if (!resendResponse.ok) {
-        toast.error(resendData.error || "Account exists, but we could not resend OTP.");
-        return;
-      }
-
-      toast.success("Existing account found. OTP resent to your email.");
-      setStep("otp");
-      return;
-    }
-
-    // OTHER ERRORS
     if (!res.ok) {
-      const message = data?.error || text || `Signup failed (${res.status})`;
-      toast.error(message);
+      toast.error(data.error || "Registration failed");
       return;
     }
 
-    // SUCCESS
-    toast.success("OTP sent to email");
-    setStep("otp");
+    toast.success(data.message || "OTP sent to email");
 
-  } catch (error) {
-    console.error(error);
+    // go to OTP screen
+    setStep("otp");
+    setOtpEmail(email);
+
+  } catch (err) {
+    console.error(err);
     toast.error("Server error");
   } finally {
     setLoading(false);
   }
 };
 
+
   // =========================
   // VERIFY OTP
   // =========================
-  const handleVerifyOtp = async (e) => {
-    e.preventDefault();
+const handleRegister = async (e) => {
+  e.preventDefault();
 
-    if (!otp) {
-      toast.error("Enter OTP code");
-      return;
-    }
+  if (!email || !username || !password) {
+    toast.error("All fields required");
+    return;
+  }
 
   setLoading(true);
 
   try {
     const res = await fetch(
-      "https://realtimechatappbackend-y8z2.onrender.com/verify-otp",
+      "https://realtimechatappbackend-y8z2.onrender.com/register",
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          code: otp,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, username, password }),
       }
     );
 
-    let data = null;
-    let text = null;
-
-    try {
-      data = await res.json();
-    } catch {
-      text = await res.text().catch(() => null);
-    }
+    const data = await res.json().catch(() => ({}));
 
     if (!res.ok) {
-      const message = data?.error || text || "Invalid OTP";
-      toast.error(message);
+      toast.error(data.error || "Registration failed");
       return;
     }
 
-    // SUCCESS
-    toast.success("Account verified successfully!");
+    toast.success(data.message || "OTP sent to email");
 
-    if (data.token) {
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user || {}));
-      localStorage.setItem("username", data.user?.username || "");
-      localStorage.setItem("email", data.user?.email || email);
-
-      setTimeout(() => {
-        if (data.user?.role === "admin") {
-          navigate("/admin");
-        } else {
-          navigate("/chat");
-        }
-      }, 1500);
-      return;
-    }
-
-    setTimeout(() => {
-      navigate("/login");
-    }, 1500);
+    // go to OTP screen
+    setStep("otp");
+    setOtpEmail(email);
 
   } catch (err) {
     console.error(err);
-
-    toast.error(
-      err.message || "Server error"
-    );
-
+    toast.error("Server error");
   } finally {
     setLoading(false);
   }
@@ -192,55 +117,85 @@ const handleRegister = async (e) => {
   // =========================
   // RESEND OTP
   // =========================
-  const handleResendOtp = async () => {
+const handleVerifyOtp = async (e) => {
+  e.preventDefault();
 
+  if (!otp) {
+    toast.error("Enter OTP");
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const res = await fetch(
+      "https://realtimechatappbackend-y8z2.onrender.com/verify-otp",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          otp,   // ✅ IMPORTANT FIX
+        }),
+      }
+    );
+
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      toast.error(data.error || "Invalid OTP");
+      return;
+    }
+
+    toast.success("Account verified!");
+
+    // save auth
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("user", JSON.stringify(data.user));
+    localStorage.setItem("username", data.user?.username);
+    localStorage.setItem("email", data.user?.email);
+
+    // redirect
+    setTimeout(() => {
+      navigate(data.user.role === "admin" ? "/admin" : "/chat");
+    }, 1000);
+
+  } catch (err) {
+    console.error(err);
+    toast.error("Server error");
+  } finally {
+    setLoading(false);
+  }
+};
+//HANDLER FOR RESENDING OTP
+const handleResendOtp = async () => {
   if (!email) {
-    toast.error("Email is required");
+    toast.error("Email required");
     return;
   }
 
   try {
-
     const res = await fetch(
       "https://realtimechatappbackend-y8z2.onrender.com/resend-otp",
       {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       }
     );
 
-    let data = {};
-
-    try {
-      data = await res.json();
-    } catch (e) {
-      data = {
-        error: "Invalid server response"
-      };
-    }
+    const data = await res.json().catch(() => ({}));
 
     if (!res.ok) {
-      toast.error(
-        data.error || "Failed to resend OTP"
-      );
+      toast.error(data.error || "Failed to resend OTP");
       return;
     }
 
     toast.success("OTP resent successfully!");
 
-  } catch (error) {
-
-    console.error(
-      "FETCH FAILED:",
-      error
-    );
-
-    toast.error(
-      "Backend not reachable (CORS or server issue)"
-    );
+  } catch (err) {
+    console.error(err);
+    toast.error("Server not reachable");
   }
 };
   return (
