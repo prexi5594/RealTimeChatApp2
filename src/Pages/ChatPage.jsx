@@ -712,20 +712,20 @@ useEffect(() => {
                         {msg.timestamp
                           ? new Date(
                               msg.timestamp
-                            ).toLocaleTimeString()
+                            ).toLocaleString()
                           : ""}
                       </span>
                     </div>
 
                     <p
   className={`mt-1 ${
-    msg.isDeleted
+    msg.is_deleted
       ? "text-gray-400 italic"
       : "text-gray-700"
   }`}
 >
   
-  {msg.isDeleted ? "Message deleted" : msg.message}
+  {msg.is_deleted ? "Message deleted" : msg.message}
 
                     </p>
                   </div>
