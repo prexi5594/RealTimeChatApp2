@@ -92,7 +92,7 @@ export async function createChatRoom(roomData) {
 
 export async function deleteChatRoom(roomId) {
   try {
-    const response = await fetch(`${BASE_URL}/rooms${roomId}`, {
+    const response = await fetch(`${BASE_URL}/rooms/${roomId}`, {
       method: "DELETE",
     });
 
