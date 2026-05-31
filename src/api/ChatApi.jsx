@@ -89,11 +89,16 @@ export async function createChatRoom(roomData) {
     throw error;
   }
 }
-
 export async function deleteChatRoom(roomId) {
   try {
-    const response = await fetch(`${BASE_URL}/rooms/${roomId}`, {
+    const token = localStorage.getItem("token");
+
+    const response = await fetch(`${BASE_URL}/admin/rooms/${roomId}`, {
       method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
     });
 
     return await parseApiResponse(response);
