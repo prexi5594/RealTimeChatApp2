@@ -368,7 +368,7 @@ const handleDeleteRoom = (roomId) => {
 const proceedWithDelete = async (roomId) => {
   const loadingToast = toast.loading("Deleting room from database...");
   try {
-    const res = await fetch(`https://realtimechatappbackend-y8z2.onrender.com/rooms/${roomId}`, {
+    const res = await fetch(`https://realtimechatappbackend-y8z2.onrender.com/rooms${roomId}`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" }
     });

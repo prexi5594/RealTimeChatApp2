@@ -39,7 +39,7 @@ export const getAllRooms = () => {
 
 // DELETE ROOM
 export const deleteRoom = (roomId) => {
-  return API.delete(`${BASE_URL}/rooms/${roomId}`);
+  return API.delete(`${BASE_URL}/rooms${roomId}`);
 };
 
 

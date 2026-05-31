@@ -75,7 +75,7 @@ export async function sendMessage(data) {
 
 export async function createChatRoom(roomData) {
   try {
-    const response = await fetch(`${BASE_URL}/rooms/`, {
+    const response = await fetch(`${BASE_URL}/rooms`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -92,7 +92,7 @@ export async function createChatRoom(roomData) {
 
 export async function deleteChatRoom(roomId) {
   try {
-    const response = await fetch(`${BASE_URL}/rooms/${roomId}`, {
+    const response = await fetch(`${BASE_URL}/rooms${roomId}`, {
       method: "DELETE",
     });
 
@@ -115,7 +115,7 @@ export async function fetchChatRooms() {
 
 export async function fetchChatRoomDetails(roomId) {
   try {
-    const response = await fetch(`${BASE_URL}/rooms/${roomId}`);
+    const response = await fetch(`${BASE_URL}/rooms${roomId}`);
     return await parseApiResponse(response);
   } catch (error) {
     console.error("fetchChatRoomDetails error:", error);
