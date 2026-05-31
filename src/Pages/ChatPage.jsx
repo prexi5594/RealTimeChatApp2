@@ -723,6 +723,7 @@ useEffect(() => {
       ? "text-gray-400 italic"
       : "text-gray-700"
   }`}
+
 >
   
   {msg.is_deleted ? "Message deleted" : msg.message}
