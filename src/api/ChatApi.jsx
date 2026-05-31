@@ -115,7 +115,7 @@ export async function fetchChatRooms() {
 
 export async function fetchChatRoomDetails(roomId) {
   try {
-    const response = await fetch(`${BASE_URL}/rooms${roomId}`);
+    const response = await fetch(`${BASE_URL}/rooms/${roomId}`);
     return await parseApiResponse(response);
   } catch (error) {
     console.error("fetchChatRoomDetails error:", error);
