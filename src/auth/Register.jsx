@@ -59,7 +59,7 @@ const handleRegister = async (e) => {
 
     // go to OTP screen
     setStep("otp");
-    setOtpEmail(email);
+    
 
   } catch (err) {
     console.error(err);
